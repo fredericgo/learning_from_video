@@ -1,4 +1,4 @@
-""" 
+"""
 Tensorflow SMPL implementation as batch.
 Specify joint types:
 'coco': Returns COCO+ 19 joints
@@ -11,7 +11,8 @@ from __future__ import division
 from __future__ import print_function
 
 import numpy as np
-import cPickle as pickle
+#import cPickle as pickle
+import pickle
 
 import tensorflow as tf
 from .batch_lbs import batch_rodrigues, batch_global_rigid_transformation
@@ -29,7 +30,7 @@ class SMPL(object):
         """
         # -- Load SMPL params --
         with open(pkl_path, 'r') as f:
-            dd = pickle.load(f)    
+            dd = pickle.load(f)
         # Mean template vertices
         self.v_template = tf.Variable(
             undo_chumpy(dd['v_template']),
@@ -158,5 +159,3 @@ class SMPL(object):
                 return verts, joints, Rs
             else:
                 return joints
-
-

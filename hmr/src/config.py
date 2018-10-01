@@ -20,6 +20,7 @@ import numpy as np
 
 curr_path = osp.dirname(osp.abspath(__file__))
 model_dir = osp.join(curr_path, '..', 'models')
+print(model_dir)
 if not osp.exists(model_dir):
     print('Fix path to models/')
     import ipdb

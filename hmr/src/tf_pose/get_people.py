@@ -21,9 +21,9 @@ parser.add_argument('--resize-out-ratio', type=float, default=4.0,
 
 args = parser.parse_args()
 
+_estimator = TfPoseEstimator(get_graph_path(args.model), target_size=(432, 368))
 
 def get_people(img_path):
-    e = TfPoseEstimator(get_graph_path(args.model), target_size=(432, 368))
 
     image = common.read_imgfile(img_path, None, None)
     wo, ho = image.shape[0], image.shape[1]
@@ -32,7 +32,7 @@ def get_people(img_path):
         logger.error('Image can not be read, path=%s' % args.image)
         sys.exit(-1)
 
-    humans = e.inference(image, upsample_size=args.resize_out_ratio)
+    humans = _estimator.inference(image, upsample_size=args.resize_out_ratio)
 
     output = []
     for h in humans:

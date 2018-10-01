@@ -4,9 +4,9 @@ import os
 import cv2
 import base64
 
-import common
-from estimator import TfPoseEstimator
-from networks import get_graph_path, model_wh
+from . import common
+from .estimator import TfPoseEstimator
+from .networks import get_graph_path, model_wh
 
 Estimator = TfPoseEstimator
 
