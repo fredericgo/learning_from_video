@@ -38,47 +38,20 @@ MODEL_XML = """
         <body name="torso" pos="0 0 1.4">
             <camera name="track" mode="trackcom" pos="0 -4 0" xyaxes="1 0 0 0 0 1"/>
             <joint armature="0" damping="0" limited="false" name="root" pos="0 0 0" stiffness="0" type="free"/>
-
             <geom fromto="0 -.07 0 0 .07 0" name="torso1" size="0.07" type="capsule"/>
             <geom name="head" pos="0 0 .19" size=".09" type="sphere" user="258"/>
             <geom fromto="-.01 -.06 -.12 -.01 .06 -.12" name="uwaist" size="0.06" type="capsule"/>
-            <body name="lwaist" pos="-.01 0 -0.260" quat="1.000 0 -0.002 0">
-                <joint armature="0.02" axis="0 0 1" damping="5" name="abdomen_z" pos="0 0 0.065" range="-45 45" stiffness="20" type="hinge"/>
-                <joint armature="0.02" axis="0 1 0" damping="5" name="abdomen_y" pos="0 0 0.065" range="-75 30" stiffness="10" type="hinge"/>
-                <geom fromto="0 -.06 0 0 .06 0" name="lwaist" size="0.06" type="capsule"/>
-                <body name="pelvis" pos="0 0 -0.165" quat="1.000 0 -0.002 0">
-                    <joint armature="0.02" axis="1 0 0" damping="5" name="abdomen_x" pos="0 0 0.1" range="-35 35" stiffness="10" type="hinge"/>
-                    <geom fromto="-.02 -.07 0 -.02 .07 0" name="butt" size="0.09" type="capsule"/>
-                    <body name="right_thigh" pos="0 -0.1 -0.04">
-                        <joint armature="0.01" axis="1 0 0" damping="5" name="right_hip_x" pos="0 0 0" range="-25 5" stiffness="10" type="hinge"/>
-                        <joint armature="0.01" axis="0 0 1" damping="5" name="right_hip_z" pos="0 0 0" range="-60 35" stiffness="10" type="hinge"/>
-                        <joint armature="0.0080" axis="0 1 0" damping="5" name="right_hip_y" pos="0 0 0" range="-110 20" stiffness="20" type="hinge"/>
-                        <geom fromto="0 0 0 0 0.01 -.34" name="right_thigh1" size="0.06" type="capsule"/>
-                        <body name="right_shin" pos="0 0.01 -0.403">
-                            <joint armature="0.0060" axis="0 -1 0" name="right_knee" pos="0 0 .02" range="-160 -2" type="hinge"/>
-                            <geom fromto="0 0 0 0 0 -.3" name="right_shin1" size="0.049" type="capsule"/>
-                            <body name="right_foot" pos="0 0 -0.45">
-                                <geom name="right_foot" pos="0 0 0.1" size="0.075" type="sphere" user="0"/>
-                            </body>
-                        </body>
-                    </body>
-                </body>
-            </body>
         </body>
     </worldbody>
-    <actuator>
-        <!-- <motor gear="100" joint="root" name="root"/> -->
-        <motor gear="100" joint="abdomen_y" name="abdomen_y"/>
-        <motor gear="100" joint="abdomen_z" name="abdomen_z"/>
-        <motor gear="100" joint="abdomen_x" name="abdomen_x"/>
-        <motor gear="100" joint="right_hip_x" name="right_hip_x"/>
-        <motor gear="100" joint="right_hip_z" name="right_hip_z"/>
-        <motor gear="300" joint="right_hip_y" name="right_hip_y"/>
-        <motor gear="200" joint="right_knee" name="right_knee"/>
-    </actuator>
+
 </mujoco>
 """
 
+
+## state description
+# qpos:
+#   0-2: torso coordinate
+#   3-6: torso rotation
 
 model = load_model_from_xml(MODEL_XML)
 sim = MjSim(model)
@@ -97,11 +70,14 @@ while True:
     # 6 right thigh y rot
     #sim.data.ctrl[2] = -100
     #sim.data.ctrl[3] = -100
-    sim.data.ctrl[6] = 0
+    #sim.data.ctrl[6] = 0
+
+    sim_state = sim.get_state()
+    print(sim_state)
 
     sim.step()
     viewer.render()
 
     step += 1
-    if step > 100 and os.getenv('TESTING') is not None:
+    if step > 10:
         break

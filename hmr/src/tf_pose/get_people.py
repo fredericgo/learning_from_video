@@ -34,10 +34,6 @@ def get_people(img_path):
 
     humans = e.inference(image, upsample_size=args.resize_out_ratio)
 
-    #output = {
-    #    "version":1.1,
-    #    "people": []
-    #}
     output = []
     for h in humans:
         keypoints = np.zeros((18,3))

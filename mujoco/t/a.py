@@ -137,14 +137,13 @@ model = load_model_from_xml(MODEL_XML)
 sim = MjSim(model)
 viewer = MjViewer(sim)
 
-sim_state = sim.get_state()
-print(sim_state)
 step = 0
 while True:
     t = time.time()
-    x, y = math.cos(t), math.sin(t)
-    #viewer.add_marker(pos=np.array([x, y, 1]))
-    #                  label=str(t))
+
+    sim_state = sim.get_state()
+    print(sim_state)
+
     sim.step()
     viewer.render()
 
