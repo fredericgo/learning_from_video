@@ -37,12 +37,26 @@ MODEL_XML = """
         <!-- <geom condim="3" material="MatPlane" name="floor" pos="0 0 0" size="10 10 0.125" type="plane"/>-->
         <body name="torso" pos="0 0 1.4">
             <camera name="track" mode="trackcom" pos="0 -4 0" xyaxes="1 0 0 0 0 1"/>
-            <joint armature="0" damping="0" limited="false" name="root" pos="0 0 0" stiffness="0" type="free"/>
+            <!--<joint armature="0" damping="0" limited="false" name="root" pos="0 0 0" stiffness="0" type="free"/>-->
             <geom fromto="0 -.07 0 0 .07 0" name="torso1" size="0.07" type="capsule"/>
             <geom name="head" pos="0 0 .19" size=".09" type="sphere" user="258"/>
             <geom fromto="-.01 -.06 -.12 -.01 .06 -.12" name="uwaist" size="0.06" type="capsule"/>
+            <body name="right_upper_arm" pos="0 -0.17 0.06">
+                <joint armature="0.0068" axis="2 1 1" name="right_shoulder1" pos="0 0 0" range="-85 60" stiffness="1" type="hinge"/>
+                <!--<joint armature="0.0051" axis="0 -1 1" name="right_shoulder2" pos="0 0 0" range="-85 60" stiffness="1" type="hinge"/>-->
+                <geom fromto="0 0 0 .16 -.16 -.16" name="right_uarm1" size="0.04 0.16" type="capsule"/>
+                <body name="right_lower_arm" pos=".18 -.18 -.18">
+                    <geom fromto="0.01 0.01 0.01 .17 .17 .17" name="right_larm" size="0.031" type="capsule"/>
+                    <geom name="right_hand" pos=".18 .18 .18" size="0.04" type="sphere"/>
+                    <camera pos="0 0 0"/>
+                </body>
+            </body>
         </body>
     </worldbody>
+    <actuator>
+        <motor gear="25" joint="right_shoulder1" name="right_shoulder1"/>
+        <!--<motor gear="25" joint="right_shoulder2" name="right_shoulder2"/>-->
+    </actuator>
 
 </mujoco>
 """
@@ -70,14 +84,15 @@ while True:
     # 6 right thigh y rot
     #sim.data.ctrl[2] = -100
     #sim.data.ctrl[3] = -100
-    #sim.data.ctrl[6] = 0
+    sim.data.ctrl[0] = -1
 
     sim_state = sim.get_state()
     print(sim_state)
-
+    x = [np.rad2deg(x) for x in sim_state.qpos]
+    print(x)
     sim.step()
     viewer.render()
 
     step += 1
-    if step > 10:
-        break
+    #if step > 100:
+    #    break

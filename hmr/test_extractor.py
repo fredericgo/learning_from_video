@@ -8,4 +8,6 @@ config(sys.argv)
 config.load_path = src.config.PRETRAINED_MODEL
 config.batch_size = 1
 
-extractor = SkeletonExtractor(config)
+extract = SkeletonExtractor(config)
+f = './data/cam5_frame000153.jpg'
+extract(f)
