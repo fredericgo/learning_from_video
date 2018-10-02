@@ -18,7 +18,7 @@ from src.RunModel import RunModel
 import src.config
 
 parser = argparse.ArgumentParser(description='tf-pose-estimation run')
-parser.add_argument('--image', type=str, default='./data/cam5_frame000153.jpg')
+parser.add_argument('--image', type=str, default='./data/coco1.png')
 parser.add_argument('--model', type=str, default='mobilenet_thin', help='cmu / mobilenet_thin')
 
 parser.add_argument('--resize', type=str, default='0x0',
@@ -118,15 +118,20 @@ def p3d(joints, cam, proc_param):
     plt.clf()
     ax = plt.axes(projection='3d')
     ax.view_init(elev=-70,azim=-90)
-    ax.scatter3D(joints[:,0],
-              joints[:,1],
-              joints[:,2], 'gray')
+    #ax.scatter3D(joints[:,0],
+    #          joints[:,1],
+    #          joints[:,2], 'gray')
+    idx = 0 
+    ax.scatter3D(joints[idx,0],
+                 joints[idx,1],
+                 joints[idx,2], c='red', s=100)
 
     for i in range(joints.shape[0]):
         x_pair = [joints[i, 0], joints[limb_parents[i], 0]]
         y_pair = [joints[i, 1], joints[limb_parents[i], 1]]
         z_pair = [joints[i, 2], joints[limb_parents[i], 2]]
         ax.plot(x_pair, y_pair, zs=z_pair, linewidth=3)
+
     ax.axis('off')
     plt.show()
     plt.savefig("test.jpg")

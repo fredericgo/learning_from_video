@@ -22,7 +22,7 @@ def inner_angle(v0, v1, degree=True):
     return angle
 
 def normalize(v):
-    return v / numpy.linalg.norm(v)
+    return v / np.linalg.norm(v)
 
 def normal_vector(v1, v2):
     return np.cross(v1, v2)
@@ -60,8 +60,8 @@ class SkeletonExtractor:
         # Add batch dimension: 1 x D x D x 3
         input_img = np.expand_dims(input_img, 0)
         joints, verts, cams, joints3d, theta = self._model.predict(input_img, get_theta=True)
-        joints3d = joints3d[:,:14]
-        kinematicTree(joints3d)
+        joints3d = joints3d[0,:14]
+        self.kinematicTree(joints3d)
 
     def kinematicTree(self, z):
         """
@@ -97,7 +97,7 @@ class SkeletonExtractor:
         # 22-23: left shoulder (1,2)
         # 24: left elbow
 
-        x_angles = np.zeros(25)
+        x = np.zeros(25)
 
         z_pelvis = (z[2] + z[3]) / 2.
 
@@ -133,6 +133,7 @@ class SkeletonExtractor:
         v_x = normalize(normal_vector(v_y, v_z))
         R = populateMatrix(v_x, v_y, v_z)
         v_new_l = R.transpose().dot(v_new_g)
+        print(v_new_g)
         print(v_new_l)
 
         # 20: right shoulder 2
