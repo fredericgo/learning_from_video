@@ -27,6 +27,7 @@ def normalize(v):
 def normal_vector(v1, v2):
     return np.cross(v1, v2)
 
+
 def populateMatrix(v1, v2, v3):
     R = np.empty((3,3))
     R[0,:] = v1
@@ -135,12 +136,16 @@ class SkeletonExtractor:
         v_new_l = R.transpose().dot(v_new_g)
         # rotation axis 1 = [2 -1 -1]
         a_1 = normalize(np.array([2,-1,-1]))
-        x[19] = inner_angle(v_new_l.dot(a_1), v_orig_l.dot(a_1))
+        v_new_p1 = v_new_l - v_new_l.dot(a_1) * a_1
+        v_orig_p1 = v_orig_l - v_orig_l.dot(a_1) * a_1
+        x[19] = inner_angle(v_new_p1, v_orig_p1)
 
         # 20: right shoulder 2
         # rotation axis 2 = [0 1 1]
         a_2 = normalize(np.array([0, 1, 1]))
-        x[20] = inner_angle(v_new_l.dot(a_2), v_orig_l.dot(a_2))
+        v_new_p2 = v_new_l - v_new_l.dot(a_2) * a_2
+        v_orig_p2 = v_orig_l - v_orig_l.dot(a_2) * a_2
+        x[20] = inner_angle(v_new_p2, v_orig_p2)
 
         # 21: right elbow
         x[21] = inner_angle(z[7]-z[6], z[7]- z[8])
