@@ -122,8 +122,34 @@ class SkeletonExtractor:
 
 
         # 15: left hip x
+        # -1 0 0
+        v_orig_l = normalize(np.array([0, -0.01, -.34]))
+        v_new_g = normalize(z[4] - z[3])
+        v_y = normalize(z[3] - z[2])
+        v_z = normalize(z[12] - z_pelvis)
+        v_x = normalize(normal_vector(v_y, v_z))
+        R = populateMatrix(v_x, v_y, v_z)
+        v_new_l = R.transpose().dot(v_new_g)
+
+        a_1 = normalize(np.array([-1, 0, 0]))
+        v_new_p1 = v_new_l - v_new_l.dot(a_1) * a_1
+        v_orig_p1 = v_orig_l - v_orig_l.dot(a_1) * a_1
+        x[15] = ccw_angle(v_new_p1, v_orig_p1, a_1)
+
         # 16: left hip z
+        # 0 0 -1
+        a_2 = normalize(np.array([0, 0, -1]))
+        v_new_p2 = v_new_l - v_new_l.dot(a_2) * a_2
+        v_orig_p2 = v_orig_l - v_orig_l.dot(a_2) * a_2
+        x[16] = ccw_angle(v_new_p2, v_orig_p2, a_2)
+
+
         # 17: left hip y
+        # 0 1 0
+        a_3 = normalize(np.array([0, 1, 0]))
+        v_new_p3 = v_new_l - v_new_l.dot(a_3) * a_3
+        v_orig_p3 = v_orig_l - v_orig_l.dot(a_3) * a_3
+        x[17] = ccw_angle(v_new_p3, v_orig_p3, a_3)
 
         # 18: left knee
         x[18] = inner_angle(z[4]-z[3], z[4]- z[5])
@@ -135,7 +161,7 @@ class SkeletonExtractor:
         v_orig_l = normalize(np.array([1, -1, -1]))
         v_new_g = normalize(z[8] - z[7])
 
-        v_y = normalize(z[8] - z[9])
+        v_y = normalize(z[9] - z[8])
         v_z = normalize(z[12] - z_pelvis)
         v_x = normalize(normal_vector(v_y, v_z))
         R = populateMatrix(v_x, v_y, v_z)
@@ -161,18 +187,13 @@ class SkeletonExtractor:
         v_orig_l = normalize(np.array([1, 1, -1]))
         v_new_g = normalize(z[10] - z[9])
 
-        v_y = normalize(z[8] - z[9])
+        v_y = normalize(z[9] - z[8])
         v_z = normalize(z[12] - z_pelvis)
         v_x = normalize(normal_vector(v_y, v_z))
         R = populateMatrix(v_x, v_y, v_z)
         v_new_l = normalize(R.transpose().dot(v_new_g))
 
-        print(v_x, v_y, v_z)
-        print(R)
-        print(v_new_g)
-
         # rotation axis 1 = [2 -1 1]
-
         a_1 = normalize(np.array([2,-1, 1]))
         v_new_p1 = v_new_l - v_new_l.dot(a_1) * a_1
         v_orig_p1 = v_orig_l - v_orig_l.dot(a_1) * a_1
