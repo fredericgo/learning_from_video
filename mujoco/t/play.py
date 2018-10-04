@@ -43,7 +43,7 @@ MODEL_XML = """
             <geom fromto="-.01 -.06 -.12 -.01 .06 -.12" name="uwaist" size="0.06" type="capsule"/>
             <body name="right_upper_arm" pos="0 -0.17 0.06">
                 <joint armature="0.0068" axis="2 1 1" name="right_shoulder1" pos="0 0 0" range="-85 60" stiffness="1" type="hinge"/>
-                <!--<joint armature="0.0051" axis="0 -1 1" name="right_shoulder2" pos="0 0 0" range="-85 60" stiffness="1" type="hinge"/>-->
+                <joint armature="0.0051" axis="0 -1 1" name="right_shoulder2" pos="0 0 0" range="-85 60" stiffness="1" type="hinge"/>
                 <geom fromto="0 0 0 .16 -.16 -.16" name="right_uarm1" size="0.04 0.16" type="capsule"/>
                 <body name="right_lower_arm" pos=".18 -.18 -.18">
                     <geom fromto="0.01 0.01 0.01 .17 .17 .17" name="right_larm" size="0.031" type="capsule"/>
@@ -55,7 +55,7 @@ MODEL_XML = """
     </worldbody>
     <actuator>
         <motor gear="25" joint="right_shoulder1" name="right_shoulder1"/>
-        <!--<motor gear="25" joint="right_shoulder2" name="right_shoulder2"/>-->
+        <motor gear="25" joint="right_shoulder2" name="right_shoulder2"/>
     </actuator>
 
 </mujoco>
@@ -84,7 +84,7 @@ while True:
     # 6 right thigh y rot
     #sim.data.ctrl[2] = -100
     #sim.data.ctrl[3] = -100
-    sim.data.ctrl[0] = -1
+    sim.data.ctrl[1] = 1
 
     sim_state = sim.get_state()
     print(sim_state)
