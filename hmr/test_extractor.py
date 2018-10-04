@@ -9,5 +9,5 @@ config.load_path = src.config.PRETRAINED_MODEL
 config.batch_size = 1
 
 extract = SkeletonExtractor(config)
-f = './data/cam5_frame000153.jpg'
+f = './data/coco1.png'
 extract(f)

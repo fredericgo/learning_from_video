@@ -111,7 +111,6 @@ def p3d(joints, cam, proc_param):
     trans = np.hstack([cam_pos, tz])
     joints = joints + trans
 
-    print(trans)
 
     # plt.ion()
     plt.figure(1)
@@ -158,7 +157,6 @@ def main(img_path):
     kps = get_people(img_path)
 
     input_img, proc_param, img = preprocess_image(img_path, kps)
-    print(proc_param)
     # Add batch dimension: 1 x D x D x 3
     input_img = np.expand_dims(input_img, 0)
 

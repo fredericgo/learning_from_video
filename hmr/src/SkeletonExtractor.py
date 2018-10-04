@@ -21,6 +21,12 @@ def inner_angle(v0, v1, degree=True):
         return np.degrees(angle)
     return angle
 
+def ccw_angle(v0, v1, a, degree=True):
+    angle = np.math.atan2(a.dot(np.cross(v0, v1)),np.dot(v0, v1))
+    if degree:
+        return np.degrees(angle)
+    return angle
+
 def normalize(v):
     return v / np.linalg.norm(v)
 
@@ -134,18 +140,18 @@ class SkeletonExtractor:
         v_x = normalize(normal_vector(v_y, v_z))
         R = populateMatrix(v_x, v_y, v_z)
         v_new_l = R.transpose().dot(v_new_g)
-        # rotation axis 1 = [2 -1 -1]
-        a_1 = normalize(np.array([2,-1,-1]))
+        # rotation axis 1 = [2 1 1]
+        a_1 = normalize(np.array([2, 1, 1]))
         v_new_p1 = v_new_l - v_new_l.dot(a_1) * a_1
         v_orig_p1 = v_orig_l - v_orig_l.dot(a_1) * a_1
-        x[19] = inner_angle(v_new_p1, v_orig_p1)
+        x[19] = ccw_angle(v_new_p1, v_orig_p1, a_1)
 
         # 20: right shoulder 2
         # rotation axis 2 = [0 1 1]
-        a_2 = normalize(np.array([0, 1, 1]))
+        a_2 = normalize(np.array([0, -1, 1]))
         v_new_p2 = v_new_l - v_new_l.dot(a_2) * a_2
         v_orig_p2 = v_orig_l - v_orig_l.dot(a_2) * a_2
-        x[20] = inner_angle(v_new_p2, v_orig_p2)
+        x[20] = ccw_angle(v_new_p2, v_orig_p2, a_2)
 
         # 21: right elbow
         x[21] = inner_angle(z[7]-z[6], z[7]- z[8])
@@ -159,21 +165,25 @@ class SkeletonExtractor:
         v_z = normalize(z[12] - z_pelvis)
         v_x = normalize(normal_vector(v_y, v_z))
         R = populateMatrix(v_x, v_y, v_z)
-        v_new_l = R.transpose().dot(v_new_g)
+        v_new_l = normalize(R.transpose().dot(v_new_g))
+
+        print(v_x, v_y, v_z)
+        print(R)
+        print(v_new_g)
 
         # rotation axis 1 = [2 -1 1]
 
         a_1 = normalize(np.array([2,-1, 1]))
         v_new_p1 = v_new_l - v_new_l.dot(a_1) * a_1
         v_orig_p1 = v_orig_l - v_orig_l.dot(a_1) * a_1
-        x[22] = inner_angle(v_new_p1, v_orig_p1)
+        x[22] = ccw_angle(v_new_p1, v_orig_p1, a_1)
 
         # 23: left shoulder 2
         # rotation axis 2 = [0 1 1]
         a_2 = normalize(np.array([0, 1, 1]))
         v_new_p2 = v_new_l - v_new_l.dot(a_2) * a_2
         v_orig_p2 = v_orig_l - v_orig_l.dot(a_2) * a_2
-        x[23] = inner_angle(v_new_p2, v_orig_p2)
+        x[23] = ccw_angle(v_new_p2, v_orig_p2, a_2)
 
         # 24: left elbow
         x[24] = inner_angle(z[10]-z[11], z[10]- z[9])
