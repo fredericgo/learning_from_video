@@ -14,6 +14,7 @@ from src.tf_pose.get_people import get_people
 import tensorflow as tf
 from .RunModel import RunModel
 import src.config as config
+from src.ik import solve_hip_angles, solve_shoulder_angles
 
 def inner_angle(v0, v1, degree=True):
     angle = np.math.atan2(np.linalg.norm(np.cross(v0, v1)),np.dot(v0, v1))
@@ -132,13 +133,14 @@ class SkeletonExtractor:
         v_new_l = R.transpose().dot(v_new_g)
 
         a_1 = normalize(np.array([-1, 0, 0]))
-        v_new_p1 = v_new_l - v_new_l.dot(a_1) * a_1
-        v_orig_p1 = v_orig_l - v_orig_l.dot(a_1) * a_1
+        a_2 = normalize(np.array([0, 0, -1]))
+
+        a = solve_shoulder_angles(v_orig_l, v_new_l, a_1, a_2)
+        print(a)
         x[15] = ccw_angle(v_new_p1, v_orig_p1, a_1)
 
         # 16: left hip z
         # 0 0 -1
-        a_2 = normalize(np.array([0, 0, -1]))
         v_new_p2 = v_new_l - v_new_l.dot(a_2) * a_2
         v_orig_p2 = v_orig_l - v_orig_l.dot(a_2) * a_2
         x[16] = ccw_angle(v_new_p2, v_orig_p2, a_2)
