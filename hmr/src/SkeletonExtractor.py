@@ -73,7 +73,8 @@ class SkeletonExtractor:
         input_img = np.expand_dims(input_img, 0)
         joints, verts, cams, joints3d, theta = self._model.predict(input_img, get_theta=True)
         joints3d = joints3d[0,:14]
-        self.kinematicTree(joints3d)
+        return joints3d
+        #self.kinematicTree(joints3d)
 
     def debug_rhip(self, z):
         x = np.zeros(25)
