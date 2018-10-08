@@ -178,21 +178,20 @@ class SkeletonExtractor:
         # 23: left shoulder 2
 
         # original vector [0 0 0] -> [.16 .16 -.16]
-        v_orig_l = normalize(np.array([1, 1, -1]))
-        v_new_g = normalize(z[10] - z[9])
-
         v_y = normalize(z[9] - z[8])
         v_z = normalize(z[12] - z_pelvis)
         v_x = normalize(normal_vector(v_y, v_z))
         R = populateMatrix(v_x, v_y, v_z)
+
+        v_orig_l = normalize(np.array([1, 1, -1]))
+        v_new_g = normalize(z[10] - z[9])
         v_new_l = normalize(R.transpose().dot(v_new_g))
         a = solve_l_shoulder_angles(v_orig_l, v_new_l)
         x[22] = a[0]
         x[23] = a[1]
 
-
         # 24: left elbow
-        v_orig_l = normalize(np.array([1, -1, 1]))
+        v_orig_l = normalize(np.array([0.16, -0.18, 0.16]))
         v_new_g = normalize(z[11] - z[10])
         v_new_l = R.transpose().dot(v_new_g)
         a = solve_l_elbow_angles(v_orig_l, v_new_l)
