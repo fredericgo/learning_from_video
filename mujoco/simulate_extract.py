@@ -1,4 +1,5 @@
 import os
+import numpy as np
 from mujoco_py import load_model_from_xml, MjSim, MjViewer
 
 MODEL_XML = """
@@ -138,11 +139,15 @@ while True:
 
     sim_state = sim.get_state()
     print(sim_state.qpos.shape)
-    #sim_state.qpos[20] = 109
-    sim_state.qpos[21] = 0
-    sim_state.qpos[22] = -81
+    sim_state.qpos[18] = np.deg2rad(3)
+    sim_state.qpos[19] = np.deg2rad(-61)
 
-    sim_state.qpos[23] = 101
+    sim_state.qpos[20] = np.deg2rad(-45)
+
+    sim_state.qpos[21] = np.deg2rad(0)
+    sim_state.qpos[22] = np.deg2rad(-81)
+
+    sim_state.qpos[23] = np.deg2rad(101)
     sim.set_state(sim_state)
     sim.forward()
     #sim.step()

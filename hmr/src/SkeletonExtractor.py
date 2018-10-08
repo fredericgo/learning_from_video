@@ -192,6 +192,10 @@ class SkeletonExtractor:
 
 
         # 24: left elbow
-        x[24] = inner_angle(z[10]-z[11], z[10]- z[9])
+        v_orig_l = normalize(np.array([1, -1, 1]))
+        v_new_g = normalize(z[11] - z[10])
+        v_new_l = R.transpose().dot(v_new_g)
+        a = solve_l_elbow_angles(v_orig_l, v_new_l)
+        x[24] = a[0]
 
         print(x)
