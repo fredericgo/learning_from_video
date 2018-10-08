@@ -1,3 +1,4 @@
+import os
 from mujoco_py import load_model_from_xml, MjSim, MjViewer
 
 MODEL_XML = """
@@ -134,14 +135,13 @@ print(sim_state)
 step = 0
 
 while True:
-    t = time.time()
 
     sim_state = sim.get_state()
     print(sim_state)
-    sim_state.qpos = x
-    sim.set_state(sim_state)
+    #sim_state.qpos = x
+    #sim.set_state(sim_state)
     sim.forward()
-    print("updated state to", state)
+    print("updated state to", sim_state)
 
 
     #sim.step()
