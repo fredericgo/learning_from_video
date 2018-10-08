@@ -14,8 +14,8 @@ from src.tf_pose.get_people import get_people
 import tensorflow as tf
 from .RunModel import RunModel
 import src.config as config
-from src.ik import solve_l_hip_angles, solve_r_hip_angles,
-                   solve_l_shoulder_angles, solve_r_shoulder_angles
+from src.ik import (solve_l_hip_angles, solve_r_hip_angles,
+                    solve_l_shoulder_angles, solve_r_shoulder_angles)
 
 def inner_angle(v0, v1, degree=True):
     angle = np.math.atan2(np.linalg.norm(np.cross(v0, v1)),np.dot(v0, v1))
