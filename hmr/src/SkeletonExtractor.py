@@ -14,7 +14,8 @@ from src.tf_pose.get_people import get_people
 import tensorflow as tf
 from .RunModel import RunModel
 import src.config as config
-from src.ik import solve_hip_angles, solve_shoulder_angles
+from src.ik import solve_l_hip_angles, solve_r_hip_angles,
+                   solve_l_shoulder_angles, solve_r_shoulder_angles
 
 def inner_angle(v0, v1, degree=True):
     angle = np.math.atan2(np.linalg.norm(np.cross(v0, v1)),np.dot(v0, v1))
@@ -123,6 +124,8 @@ class SkeletonExtractor:
 
 
         # 15: left hip x
+        # 16: left hip z
+        # 17: left hip y
         # -1 0 0
         v_orig_l = normalize(np.array([0, -0.01, -.34]))
         v_new_g = normalize(z[4] - z[3])
@@ -132,31 +135,14 @@ class SkeletonExtractor:
         R = populateMatrix(v_x, v_y, v_z)
         v_new_l = R.transpose().dot(v_new_g)
 
-        a_1 = normalize(np.array([-1, 0, 0]))
-        a_2 = normalize(np.array([0, 0, -1]))
-
-        a = solve_shoulder_angles(v_orig_l, v_new_l, a_1, a_2)
-        print(a)
-        x[15] = ccw_angle(v_new_p1, v_orig_p1, a_1)
-
-        # 16: left hip z
-        # 0 0 -1
-        v_new_p2 = v_new_l - v_new_l.dot(a_2) * a_2
-        v_orig_p2 = v_orig_l - v_orig_l.dot(a_2) * a_2
-        x[16] = ccw_angle(v_new_p2, v_orig_p2, a_2)
-
-
-        # 17: left hip y
-        # 0 1 0
-        a_3 = normalize(np.array([0, 1, 0]))
-        v_new_p3 = v_new_l - v_new_l.dot(a_3) * a_3
-        v_orig_p3 = v_orig_l - v_orig_l.dot(a_3) * a_3
-        x[17] = ccw_angle(v_new_p3, v_orig_p3, a_3)
+        a = solve_l_hip_angles(v_orig_l, v_new_l)
+        x[15:18] = a
 
         # 18: left knee
         x[18] = inner_angle(z[4]-z[3], z[4]- z[5])
 
         # 19: right shoulder 1
+        # 20: right shoulder 2
         # local y : vector pointing from right shoulder to left
         # local z : vector pointing from pelvis to thorax
         # original vector [0 0 0] -> [.16 -.16 -.16]
@@ -168,23 +154,16 @@ class SkeletonExtractor:
         v_x = normalize(normal_vector(v_y, v_z))
         R = populateMatrix(v_x, v_y, v_z)
         v_new_l = R.transpose().dot(v_new_g)
-        # rotation axis 1 = [2 1 1]
-        a_1 = normalize(np.array([2, 1, 1]))
-        v_new_p1 = v_new_l - v_new_l.dot(a_1) * a_1
-        v_orig_p1 = v_orig_l - v_orig_l.dot(a_1) * a_1
-        x[19] = ccw_angle(v_new_p1, v_orig_p1, a_1)
-
-        # 20: right shoulder 2
-        # rotation axis 2 = [0 1 1]
-        a_2 = normalize(np.array([0, -1, 1]))
-        v_new_p2 = v_new_l - v_new_l.dot(a_2) * a_2
-        v_orig_p2 = v_orig_l - v_orig_l.dot(a_2) * a_2
-        x[20] = ccw_angle(v_new_p2, v_orig_p2, a_2)
+        a = solve_r_shoulder_angles(v_orig_l, v_new_l)
+        x[19] = a[0]
+        x[20] = a[1]
 
         # 21: right elbow
         x[21] = inner_angle(z[7]-z[6], z[7]- z[8])
 
         # 22: left shoulder 1
+        # 23: left shoulder 2
+
         # original vector [0 0 0] -> [.16 .16 -.16]
         v_orig_l = normalize(np.array([1, 1, -1]))
         v_new_g = normalize(z[10] - z[9])
@@ -194,19 +173,10 @@ class SkeletonExtractor:
         v_x = normalize(normal_vector(v_y, v_z))
         R = populateMatrix(v_x, v_y, v_z)
         v_new_l = normalize(R.transpose().dot(v_new_g))
+        a = solve_l_shoulder_angles(v_orig_l, v_new_l)
+        x[22] = a[0]
+        x[23] = a[1]
 
-        # rotation axis 1 = [2 -1 1]
-        a_1 = normalize(np.array([2,-1, 1]))
-        v_new_p1 = v_new_l - v_new_l.dot(a_1) * a_1
-        v_orig_p1 = v_orig_l - v_orig_l.dot(a_1) * a_1
-        x[22] = ccw_angle(v_new_p1, v_orig_p1, a_1)
-
-        # 23: left shoulder 2
-        # rotation axis 2 = [0 1 1]
-        a_2 = normalize(np.array([0, 1, 1]))
-        v_new_p2 = v_new_l - v_new_l.dot(a_2) * a_2
-        v_orig_p2 = v_orig_l - v_orig_l.dot(a_2) * a_2
-        x[23] = ccw_angle(v_new_p2, v_orig_p2, a_2)
 
         # 24: left elbow
         x[24] = inner_angle(z[10]-z[11], z[10]- z[9])
