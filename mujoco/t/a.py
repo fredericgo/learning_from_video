@@ -144,7 +144,7 @@ while True:
     sim_state = sim.get_state()
     print(sim_state)
 
-    #sim.step()
+    sim.step()
     viewer.render()
 
     step += 1
