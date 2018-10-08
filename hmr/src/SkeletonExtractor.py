@@ -41,9 +41,9 @@ def normal_vector(v1, v2):
 
 def populateMatrix(v1, v2, v3):
     R = np.empty((3,3))
-    R[0,:] = v1
-    R[1,:] = v2
-    R[2,:] = v3
+    R[:,0] = v1
+    R[:,1] = v2
+    R[:,2] = v3
     return R
 
 def preprocess_image(img_path, kps):
@@ -99,7 +99,6 @@ class SkeletonExtractor:
         ax.scatter(*z[3])
         ax.quiver(*zVec(v_new_g),color='yellow')
 
-        print(v_new_l)
         ax.set_xlim(-1,1)
         ax.set_ylim(-1,1)
         ax.set_zlim(-1,1)

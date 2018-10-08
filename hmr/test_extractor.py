@@ -11,4 +11,5 @@ config.batch_size = 1
 e = SkeletonExtractor(config)
 f = './data/coco1.png'
 z = e(f)
-e.debug_rhip(z)
+#e.debug_rhip(z)
+e.kinematicTree(z)
