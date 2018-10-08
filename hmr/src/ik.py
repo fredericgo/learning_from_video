@@ -135,6 +135,11 @@ def solve_r_elbow_angles(v_old, v_new):
     b1 = (-90, 50)
     return solve_one_angle(v_old, v_new, a1, b1)
 
+def solve_l_elbow_angles(v_old, v_new):
+    a1 = np.array([0, -1, -1])
+    b1 = (-90, 50)
+    return solve_one_angle(v_old, v_new, a1, b1)
+
 if __name__ == "__main__":
     v_o = np.array([1,2,3])
     v_new = np.array([2,1,2])
