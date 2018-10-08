@@ -9,6 +9,29 @@ from ikpy.chain import Chain
 from ikpy.link import OriginLink, URDFLink
 import numpy as np
 
+
+def solve_one_angle(v_o, v_new, a1, b1):
+    chain = Chain(name='arm', links=[
+        #OriginLink(),
+        URDFLink(
+          name="shoulder1",
+          translation_vector=[0, 0, 0],
+          orientation=[0, 0, 0],
+          bounds=b1,
+          rotation=a1,
+        ),
+         URDFLink(
+          name="elbow",
+          translation_vector=v_o,
+          orientation=[0, 0, 0],
+          rotation=[0, 0, 0],
+        )
+    ])
+    target_frame = np.eye(4)
+    target_frame[:3, 3] = v_new
+    angles = chain.inverse_kinematics(target_frame)[:2]
+    return np.rad2deg(angles)
+
 def solve_shoulder_angles(v_o, v_new, a1, a2, b1, b2):
     chain = Chain(name='arm', links=[
         #OriginLink(),
@@ -106,6 +129,11 @@ def solve_r_hip_angles(v_old, v_new):
     b2 = (-60, 35)
     b3 = (-120, 20)
     return solve_hip_angles(v_old, v_new, a1, a2, a3, b1, b2, b3)
+
+def solve_r_elbow_angles(v_old, v_new):
+    a1 = np.array([0, -1, 1])
+    b1 = (-90, 50)
+    return solve_one_angle(v_old, v_new, a1, b1)
 
 if __name__ == "__main__":
     v_o = np.array([1,2,3])

@@ -15,7 +15,8 @@ import tensorflow as tf
 from .RunModel import RunModel
 import src.config as config
 from src.ik import (solve_l_hip_angles, solve_r_hip_angles,
-                    solve_l_shoulder_angles, solve_r_shoulder_angles)
+                    solve_l_shoulder_angles, solve_r_shoulder_angles,
+                    solve_r_elbow_angles)
 
 def inner_angle(v0, v1, degree=True):
     angle = np.math.atan2(np.linalg.norm(np.cross(v0, v1)),np.dot(v0, v1))
@@ -167,7 +168,11 @@ class SkeletonExtractor:
         x[20] = a[1]
 
         # 21: right elbow
-        x[21] = inner_angle(z[7]-z[6], z[7]- z[8])
+        v_orig_l = normalize(np.array([1, 1, 1]))
+        v_new_g = normalize(z[6] - z[7])
+        v_new_l = R.transpose().dot(v_new_g)
+        a = solve_r_elbow_angles(v_orig_l, v_new_l)
+        x[21] = a[0]
 
         # 22: left shoulder 1
         # 23: left shoulder 2

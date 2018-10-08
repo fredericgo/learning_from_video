@@ -137,13 +137,14 @@ step = 0
 while True:
 
     sim_state = sim.get_state()
-    print(sim_state)
-    #sim_state.qpos = x
-    #sim.set_state(sim_state)
+    print(sim_state.qpos.shape)
+    #sim_state.qpos[20] = 109
+    sim_state.qpos[21] = 0
+    sim_state.qpos[22] = -81
+
+    sim_state.qpos[23] = 101
+    sim.set_state(sim_state)
     sim.forward()
-    print("updated state to", sim_state)
-
-
     #sim.step()
     viewer.render()
 
