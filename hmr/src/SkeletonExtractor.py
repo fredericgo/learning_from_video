@@ -120,7 +120,7 @@ class SkeletonExtractor:
         # 12: right hip z
         # 13: right hip y
         v_orig_l = normalize(np.array([0, 0.01, -.34]))
-        v_new_g = normalize(z[4] - z[3])
+        v_new_g = normalize(z[1] - z[2])
         v_y = normalize(z[3] - z[2])
         v_z = normalize(z[12] - z_pelvis)
         v_x = normalize(normal_vector(v_y, v_z))
