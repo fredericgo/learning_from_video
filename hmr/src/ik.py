@@ -101,8 +101,8 @@ def solve_hip_angles(v_o, v_new, a1, a2, a3, b1, b2, b3):
 def solve_l_shoulder_angles(v_old, v_new):
     a1 = np.array([2,-1, 1])
     a2 = np.array([0, 1, 1])
-    b1 = (-68, 85)
-    b2 = (-68, 85)
+    b1 = (-60, 85)
+    b2 = (-60, 85)
     return solve_shoulder_angles(v_old, v_new, a1, a2, b1, b2)
 
 def solve_r_shoulder_angles(v_old, v_new):

@@ -144,10 +144,10 @@ while True:
 
     sim_state.qpos[20] = np.deg2rad(-45)
 
-    sim_state.qpos[21] = np.deg2rad(0)
-    sim_state.qpos[22] = np.deg2rad(-81)
+    sim_state.qpos[21] = np.deg2rad(-0)
+    sim_state.qpos[22] = np.deg2rad(-0)
 
-    sim_state.qpos[23] = np.deg2rad(101)
+    sim_state.qpos[23] = np.deg2rad(0)
     sim.set_state(sim_state)
     sim.forward()
     #sim.step()
