@@ -17,6 +17,8 @@ import src.config as config
 from src.ik import (solve_l_hip_angles, solve_r_hip_angles,
                     solve_l_shoulder_angles, solve_r_shoulder_angles,
                     solve_r_elbow_angles, solve_l_elbow_angles)
+import matplotlib.pyplot as plt
+
 
 def inner_angle(v0, v1, degree=True):
     angle = np.math.atan2(np.linalg.norm(np.cross(v0, v1)),np.dot(v0, v1))
@@ -72,6 +74,31 @@ class SkeletonExtractor:
         joints, verts, cams, joints3d, theta = self._model.predict(input_img, get_theta=True)
         joints3d = joints3d[0,:14]
         self.kinematicTree(joints3d)
+
+    def debug_rhip(self, z):
+        x = np.zeros(25)
+        z_pelvis = (z[2] + z[3]) / 2.
+        v_orig_l = normalize(np.array([0, 0.01, -.34]))
+        v_new_g = normalize(z[1] - z[2])
+        v_y = normalize(z[3] - z[2]).tolist()
+        v_z = normalize(z[12] - z_pelvis).tolist()
+        v_x = normalize(normal_vector(v_y, v_z)).tolist()
+        R = populateMatrix(v_x, v_y, v_z)
+        v_new_l = R.transpose().dot(v_new_g)
+
+        fig = plt.figure()
+        ax = fig.add_subplot(111, projection='3d')
+        ax.quiver(*xo)
+        ax.quiver(*v_x, color='red')
+        ax.quiver(*a1,color='g')
+        ax.quiver(*a2,color='g')
+
+        ax.set_xlim(-1,1)
+        ax.set_ylim(-1,1)
+        ax.set_zlim(-1,1)
+        plt.show()
+
+
 
     def kinematicTree(self, z):
         """
