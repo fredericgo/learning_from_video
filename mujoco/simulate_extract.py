@@ -140,30 +140,32 @@ while True:
     sim_state = sim.get_state()
     print(sim_state.qpos.shape)
     # r hip
-    sim_state.qpos[10] = np.deg2rad(88)
-    sim_state.qpos[11] = np.deg2rad(17)
-    sim_state.qpos[12] = np.deg2rad(-24)
+    sim_state.qpos[10] = np.deg2rad(-26)
+    sim_state.qpos[11] = np.deg2rad(-8)
+    sim_state.qpos[12] = np.deg2rad(-55)
 
     # r knee
     sim_state.qpos[13] = np.deg2rad(3)
 
     # l hip
-    sim_state.qpos[14] = np.deg2rad(-54)
-    sim_state.qpos[15] = np.deg2rad(-0.45)
-    sim_state.qpos[16] = np.deg2rad(-17.46)
+    sim_state.qpos[14] = np.deg2rad(-17)
+    sim_state.qpos[15] = np.deg2rad(-12)
+    sim_state.qpos[16] = np.deg2rad(-86)
 
     # l knee
     sim_state.qpos[17] = np.deg2rad(0)
 
-    sim_state.qpos[18] = np.deg2rad(3)
-    sim_state.qpos[19] = np.deg2rad(-61)
+    # r shoulder
+    sim_state.qpos[18] = np.deg2rad(10)
+    sim_state.qpos[19] = np.deg2rad(170)
 
-    sim_state.qpos[20] = np.deg2rad(-45)
+    sim_state.qpos[20] = np.deg2rad(-27)
 
-    sim_state.qpos[21] = np.deg2rad(0)
-    sim_state.qpos[22] = np.deg2rad(0)
+    # l shoulder
+    sim_state.qpos[21] = np.deg2rad(-6)
+    sim_state.qpos[22] = np.deg2rad(27)
 
-    sim_state.qpos[23] = np.deg2rad(0)
+    sim_state.qpos[23] = np.deg2rad(-52)
     sim.set_state(sim_state)
     sim.forward()
     #sim.step()

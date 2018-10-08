@@ -131,14 +131,29 @@ def solve_r_hip_angles(v_old, v_new):
     return solve_hip_angles(v_old, v_new, a1, a2, a3, b1, b2, b3)
 
 def solve_r_elbow_angles(v_old, v_new):
+    v_old = np.array([0.16, 0.16, 0.16])
     a1 = np.array([0, -1, 1])
     b1 = (-90, 50)
     return solve_one_angle(v_old, v_new, a1, b1)
 
-def solve_l_elbow_angles(v_old, v_new):
+def solve_l_elbow_angles(v_new):
+    v_old = np.array([0.16, -0.18, 0.16])
     a1 = np.array([0, -1, -1])
     b1 = (-90, 50)
     return solve_one_angle(v_old, v_new, a1, b1)
+
+def solve_r_knee_angles(v_new):
+    v_old = np.array([0, 0, -0.3])
+    a1 = np.array([0, -1, 0])
+    b1 = (-160, -2)
+    return solve_one_angle(v_old, v_new, a1, b1)
+
+def solve_l_knee_angles(v_new):
+    v_old = np.array([0, 0, -0.3])
+    a1 = np.array([0, -1, 0])
+    b1 = (-160, -2)
+    return solve_one_angle(v_old, v_new, a1, b1)
+
 
 if __name__ == "__main__":
     v_o = np.array([1,2,3])

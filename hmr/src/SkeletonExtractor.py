@@ -16,7 +16,8 @@ from .RunModel import RunModel
 import src.config as config
 from src.ik import (solve_l_hip_angles, solve_r_hip_angles,
                     solve_l_shoulder_angles, solve_r_shoulder_angles,
-                    solve_r_elbow_angles, solve_l_elbow_angles)
+                    solve_r_elbow_angles, solve_l_elbow_angles,
+                    solve_l_knee_angles, solve_r_knee_angles)
 import matplotlib.pyplot as plt
 
 
@@ -163,7 +164,10 @@ class SkeletonExtractor:
         x[11:14] = a
 
         # 14: right knee
-        x[14] = inner_angle(z[1]-z[2], z[1]- z[0])
+        v_new_g = normalize(z[0] - z[1])
+        v_new_l = R.transpose().dot(v_new_g)
+        a = solve_r_knee_angles(v_new_l)
+        x[14] = a[0]
 
         # 15: left hip x
         # 16: left hip z
@@ -181,7 +185,10 @@ class SkeletonExtractor:
         x[15:18] = a
 
         # 18: left knee
-        x[18] = inner_angle(z[4]-z[3], z[4]- z[5])
+        v_new_g = normalize(z[6] - z[7])
+        v_new_l = R.transpose().dot(v_new_g)
+        a = solve_r_knee_angles(v_new_l)
+        x[18] = a[0]
 
         # 19: right shoulder 1
         # 20: right shoulder 2
@@ -224,10 +231,9 @@ class SkeletonExtractor:
         x[23] = a[1]
 
         # 24: left elbow
-        v_orig_l = normalize(np.array([0.16, -0.18, 0.16]))
         v_new_g = normalize(z[11] - z[10])
         v_new_l = R.transpose().dot(v_new_g)
-        a = solve_l_elbow_angles(v_orig_l, v_new_l)
+        a = solve_l_elbow_angles(v_new_l)
         x[24] = a[0]
 
         print(x)
