@@ -10,5 +10,5 @@ config.batch_size = 1
 
 e = SkeletonExtractor(config)
 f = './data/coco1.png'
-z = extract(f)
+z = e(f)
 e.debug_rhip(z)
