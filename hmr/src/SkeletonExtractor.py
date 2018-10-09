@@ -215,7 +215,7 @@ class SkeletonExtractor:
         # local y : vector pointing from right shoulder to left
         # local z : vector pointing from pelvis to thorax
         v_y = normalize(z[9] - z[8])
-        v_z = normalize(z[12] - z_pelvis)
+        v_z = normalize(z[13] - z[12])
         v_x = normalize(normal_vector(v_y, v_z))
         R = populateMatrix(v_x, v_y, v_z)
 
@@ -236,7 +236,7 @@ class SkeletonExtractor:
         # 23: left shoulder 2
         # original vector [0 0 0] -> [.16 .16 -.16]
         v_y = normalize(z[9] - z[8])
-        v_z = normalize(z[12] - z_pelvis)
+        v_z = normalize(z[13] - z[12])
         v_x = normalize(normal_vector(v_y, v_z))
         R = populateMatrix(v_x, v_y, v_z)
 
