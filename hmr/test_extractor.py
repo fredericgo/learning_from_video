@@ -13,6 +13,6 @@ e = SkeletonExtractor(config)
 f = './data/coco4.png'
 z = e(f)
 #e.debug_rhip(z)
-data = e.kinematicTree(z)
+#data = e.kinematicTree(z)
 
-np.save('k_tree.npy', data)
+#np.save('k_tree.npy', data)

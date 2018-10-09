@@ -105,6 +105,35 @@ class SkeletonExtractor:
         ax.set_zlim(-1,1)
         plt.show()
 
+    def debug_rknee(self, z):
+        x = np.zeros(25)
+        z_pelvis = (z[2] + z[3]) / 2.
+        v_orig_l = normalize(np.array([0, 0, -0.3]))
+        v_y = normalize(z[3] - z[2])
+        v_z = normalize(z[12] - z_pelvis)
+        v_x = normalize(normal_vector(v_y, v_z))
+        R = populateMatrix(v_x, v_y, v_z)
+        
+        v_new_g = normalize(z[0] - z[1])
+        v_new_l = R.transpose().dot(v_new_g)
+
+        def zVec(v):
+            return [0, 0, 0] + v.tolist()
+
+        fig = plt.figure()
+        ax = fig.add_subplot(111, projection='3d')
+        ax.quiver(*zVec(v_x),color='red')
+        ax.quiver(*zVec(v_y),color='green')
+        ax.quiver(*zVec(v_z),color='blue')
+        ax.scatter(*z[2])
+        ax.scatter(*z[3])
+        ax.quiver(*zVec(v_new_g),color='yellow')
+
+        ax.set_xlim(-1,1)
+        ax.set_ylim(-1,1)
+        ax.set_zlim(-1,1)
+        plt.show()
+
     def kinematicTree(self, z):
         """
         z: 3D joint coordinates 14x3
