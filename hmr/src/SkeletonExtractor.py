@@ -201,21 +201,19 @@ class SkeletonExtractor:
         R = populateMatrix(v_x, v_y, v_z)
         v_new_g = normalize(z[4] - z[3])
         v_new_l = R.transpose().dot(v_new_g)
-
         a = solve_l_hip_angles(v_new_l)
         x[15:18] = a
 
         # 18: left knee
-        v_new_g = normalize(z[5] - z[4])
-        v_new_l = R.transpose().dot(v_new_g)
-        a = solve_l_knee_angles(v_new_l)
-        x[18] = a[0]
+        v_leg = normalize(z[5] - z[4])
+        v_thigh = normalize(z[4] - z[3])
+        a = inner_angle(v_leg, v_thigh)
+        x[18] = -a
 
         # 19: right shoulder 1
         # 20: right shoulder 2
         # local y : vector pointing from right shoulder to left
         # local z : vector pointing from pelvis to thorax
-
         v_y = normalize(z[9] - z[8])
         v_z = normalize(z[12] - z_pelvis)
         v_x = normalize(normal_vector(v_y, v_z))
@@ -229,14 +227,13 @@ class SkeletonExtractor:
         x[20] = a[1]
 
         # 21: right elbow
-        v_new_g = normalize(z[6] - z[7])
-        v_new_l = R.transpose().dot(v_new_g)
-        a = solve_r_elbow_angles(v_new_l)
-        x[21] = a[0]
+        v_lowarm = normalize(z[6] - z[7])
+        v_upperarm = normalize(z[7] - z[8])
+        a = inner_angle(v_upperarm, v_lowarm)
+        x[21] = -a
 
         # 22: left shoulder 1
         # 23: left shoulder 2
-
         # original vector [0 0 0] -> [.16 .16 -.16]
         v_y = normalize(z[9] - z[8])
         v_z = normalize(z[12] - z_pelvis)
@@ -250,9 +247,9 @@ class SkeletonExtractor:
         x[23] = a[1]
 
         # 24: left elbow
-        v_new_g = normalize(z[11] - z[10])
-        v_new_l = R.transpose().dot(v_new_g)
-        a = solve_l_elbow_angles(v_new_l)
-        x[24] = a[0]
+        v_lowarm = normalize(z[11] - z[10])
+        v_upperarm = normalize(z[10] - z[9])
+        a = inner_angle(v_upperarm, v_lowarm)
+        x[24] = -a
 
         return x[1:]
