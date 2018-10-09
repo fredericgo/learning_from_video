@@ -185,9 +185,9 @@ class SkeletonExtractor:
         x[15:18] = a
 
         # 18: left knee
-        v_new_g = normalize(z[6] - z[7])
+        v_new_g = normalize(z[5] - z[4])
         v_new_l = R.transpose().dot(v_new_g)
-        a = solve_r_knee_angles(v_new_l)
+        a = solve_l_knee_angles(v_new_l)
         x[18] = a[0]
 
         # 19: right shoulder 1
@@ -208,7 +208,6 @@ class SkeletonExtractor:
         x[20] = a[1]
 
         # 21: right elbow
-        v_orig_l = normalize(np.array([1, 1, 1]))
         v_new_g = normalize(z[6] - z[7])
         v_new_l = R.transpose().dot(v_new_g)
         a = solve_r_elbow_angles(v_orig_l, v_new_l)
