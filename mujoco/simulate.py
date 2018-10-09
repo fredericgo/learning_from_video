@@ -153,21 +153,21 @@ while True:
     sim_state.qpos[16] = np.deg2rad(-86)
 
     # l knee
-    sim_state.qpos[17] = np.deg2rad(-86)
+    sim_state.qpos[17] = np.deg2rad(-114)
 
     # r shoulder
-    sim_state.qpos[18] = np.deg2rad(-114)
-    sim_state.qpos[19] = np.deg2rad(10)
+    sim_state.qpos[18] = np.deg2rad(10)
+    sim_state.qpos[19] = np.deg2rad(-9)
 
     # r elbow
-    sim_state.qpos[20] = np.deg2rad(-27)
+    sim_state.qpos[20] = np.deg2rad(-43)
 
     # l shoulder
     sim_state.qpos[21] = np.deg2rad(-6)
     sim_state.qpos[22] = np.deg2rad(27)
 
     sim_state.qpos[23] = np.deg2rad(-70)
-    
+
     sim.set_state(sim_state)
     sim.forward()
     #sim.step()

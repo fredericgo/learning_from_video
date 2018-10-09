@@ -160,7 +160,7 @@ class SkeletonExtractor:
         v_x = normalize(normal_vector(v_y, v_z))
         R = populateMatrix(v_x, v_y, v_z)
         v_new_l = R.transpose().dot(v_new_g)
-        a = solve_r_hip_angles(v_orig_l, v_new_l)
+        a = solve_r_hip_angles(v_new_l)
         x[11:14] = a
 
         # 14: right knee
@@ -181,7 +181,7 @@ class SkeletonExtractor:
         R = populateMatrix(v_x, v_y, v_z)
         v_new_l = R.transpose().dot(v_new_g)
 
-        a = solve_l_hip_angles(v_orig_l, v_new_l)
+        a = solve_l_hip_angles(v_new_l)
         x[15:18] = a
 
         # 18: left knee
@@ -194,23 +194,22 @@ class SkeletonExtractor:
         # 20: right shoulder 2
         # local y : vector pointing from right shoulder to left
         # local z : vector pointing from pelvis to thorax
-        # original vector [0 0 0] -> [.16 -.16 -.16]
-        v_orig_l = normalize(np.array([1, -1, -1]))
-        v_new_g = normalize(z[8] - z[7])
 
         v_y = normalize(z[9] - z[8])
         v_z = normalize(z[12] - z_pelvis)
         v_x = normalize(normal_vector(v_y, v_z))
         R = populateMatrix(v_x, v_y, v_z)
+        v_new_g = normalize(z[8] - z[7])
         v_new_l = R.transpose().dot(v_new_g)
-        a = solve_r_shoulder_angles(v_orig_l, v_new_l)
+
+        a = solve_r_shoulder_angles(v_new_l)
         x[19] = a[0]
         x[20] = a[1]
 
         # 21: right elbow
         v_new_g = normalize(z[6] - z[7])
         v_new_l = R.transpose().dot(v_new_g)
-        a = solve_r_elbow_angles(v_orig_l, v_new_l)
+        a = solve_r_elbow_angles(v_new_l)
         x[21] = a[0]
 
         # 22: left shoulder 1
@@ -222,10 +221,9 @@ class SkeletonExtractor:
         v_x = normalize(normal_vector(v_y, v_z))
         R = populateMatrix(v_x, v_y, v_z)
 
-        v_orig_l = normalize(np.array([1, 1, -1]))
         v_new_g = normalize(z[10] - z[9])
         v_new_l = normalize(R.transpose().dot(v_new_g))
-        a = solve_l_shoulder_angles(v_orig_l, v_new_l)
+        a = solve_l_shoulder_angles(v_new_l)
         x[22] = a[0]
         x[23] = a[1]
 

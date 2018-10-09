@@ -98,21 +98,24 @@ def solve_hip_angles(v_o, v_new, a1, a2, a3, b1, b2, b3):
     angles = chain.inverse_kinematics(target_frame)[:3]
     return np.rad2deg(angles)
 
-def solve_l_shoulder_angles(v_old, v_new):
+def solve_l_shoulder_angles(v_new):
+    v_old = np.array([1, 1, -1])
     a1 = np.array([2,-1, 1])
     a2 = np.array([0, 1, 1])
     b1 = (-60, 85)
     b2 = (-60, 85)
     return solve_shoulder_angles(v_old, v_new, a1, a2, b1, b2)
 
-def solve_r_shoulder_angles(v_old, v_new):
+def solve_r_shoulder_angles(v_new):
+    v_old = np.array([1, -1, -1])
     a1 = np.array([2, 1, 1])
     a2 = np.array([0, -1, 1])
     b1 = (-85, 60)
     b2 = (-85, 60)
     return solve_shoulder_angles(v_old, v_new, a1, a2, b1, b2)
 
-def solve_l_hip_angles(v_old, v_new):
+def solve_l_hip_angles(v_new):
+    v_old = np.array([[0, -0.01, -.34]])
     a1 = np.array([-1, 0, 0])
     a2 = np.array([0, 0, -1])
     a3 = np.array([0, 1, 0])
@@ -121,7 +124,8 @@ def solve_l_hip_angles(v_old, v_new):
     b3 = (-120, 20)
     return solve_hip_angles(v_old, v_new, a1, a2, a3, b1, b2, b3)
 
-def solve_r_hip_angles(v_old, v_new):
+def solve_r_hip_angles(v_new):
+    v_old = np.array([0, 0.01, -.34])
     a1 = np.array([1, 0, 0])
     a2 = np.array([0, 0, 1])
     a3 = np.array([0, 1, 0])
@@ -130,7 +134,7 @@ def solve_r_hip_angles(v_old, v_new):
     b3 = (-120, 20)
     return solve_hip_angles(v_old, v_new, a1, a2, a3, b1, b2, b3)
 
-def solve_r_elbow_angles(v_old, v_new):
+def solve_r_elbow_angles(v_new):
     v_old = np.array([0.16, 0.16, 0.16])
     a1 = np.array([0, -1, 1])
     b1 = (-90, 50)
