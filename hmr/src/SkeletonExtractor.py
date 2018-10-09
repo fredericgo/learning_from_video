@@ -186,15 +186,10 @@ class SkeletonExtractor:
         x[11:14] = a
 
         # 14: right knee
-        v_new_g = normalize(z[0] - z[1])
-        v_x = normalize(z[1] - z[2])
-        v_z = normalize([0, -v_y[2], v_y[1]])
-        v_z = normalize(normal_vector(v_z, v_x))
-        R = populateMatrix(v_x, v_y, v_z)
-        v_new_l = R.transpose().dot(v_new_g)
-
-        a = solve_r_knee_angles(v_new_l)
-        x[14] = a[0]
+        v_leg = normalize(z[0] - z[1])
+        v_thigh = normalize(z[1] - z[2])
+        a = inner_angle(v_leg, v_thigh)
+        x[14] = -a
 
         # 15: left hip x
         # 16: left hip z
