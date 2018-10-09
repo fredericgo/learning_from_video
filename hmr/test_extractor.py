@@ -2,6 +2,7 @@ from absl import flags
 import src.config
 import sys
 from src.SkeletonExtractor import SkeletonExtractor
+import numpy as np
 
 config = flags.FLAGS
 config(sys.argv)
@@ -13,3 +14,5 @@ f = './data/coco4.png'
 z = e(f)
 #e.debug_rhip(z)
 data = e.kinematicTree(z)
+
+np.save('k_tree.npy', data)

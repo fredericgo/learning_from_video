@@ -227,4 +227,4 @@ class SkeletonExtractor:
         a = solve_l_elbow_angles(v_new_l)
         x[24] = a[0]
 
-        return x
+        return x[1:]
