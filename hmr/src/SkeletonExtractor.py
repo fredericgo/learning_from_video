@@ -105,14 +105,11 @@ class SkeletonExtractor:
         ax.set_zlim(-1,1)
         plt.show()
 
-
-
     def kinematicTree(self, z):
         """
         z: 3D joint coordinates 14x3
         v: vectors
         """
-
         # 0 right foot
         # 1 right knee
         # 2 right hip
@@ -142,9 +139,7 @@ class SkeletonExtractor:
         # 24: left elbow
 
         x = np.zeros(25)
-
         z_pelvis = (z[2] + z[3]) / 2.
-
 
         # 8: abdomen z
         # 9: abdomen y
@@ -153,7 +148,6 @@ class SkeletonExtractor:
         # 11: right hip x
         # 12: right hip z
         # 13: right hip y
-        v_orig_l = normalize(np.array([0, 0.01, -.34]))
         v_new_g = normalize(z[1] - z[2])
         v_y = normalize(z[3] - z[2])
         v_z = normalize(z[12] - z_pelvis)
@@ -173,11 +167,11 @@ class SkeletonExtractor:
         # 16: left hip z
         # 17: left hip y
         # -1 0 0
-        v_new_g = normalize(z[4] - z[3])
         v_y = normalize(z[3] - z[2])
         v_z = normalize(z[12] - z_pelvis)
         v_x = normalize(normal_vector(v_y, v_z))
         R = populateMatrix(v_x, v_y, v_z)
+        v_new_g = normalize(z[4] - z[3])
         v_new_l = R.transpose().dot(v_new_g)
 
         a = solve_l_hip_angles(v_new_l)
@@ -198,6 +192,7 @@ class SkeletonExtractor:
         v_z = normalize(z[12] - z_pelvis)
         v_x = normalize(normal_vector(v_y, v_z))
         R = populateMatrix(v_x, v_y, v_z)
+
         v_new_g = normalize(z[8] - z[7])
         v_new_l = R.transpose().dot(v_new_g)
 
@@ -232,4 +227,4 @@ class SkeletonExtractor:
         a = solve_l_elbow_angles(v_new_l)
         x[24] = a[0]
 
-        print(x)
+        return x

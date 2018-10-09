@@ -9,7 +9,7 @@ config.load_path = src.config.PRETRAINED_MODEL
 config.batch_size = 1
 
 e = SkeletonExtractor(config)
-f = './data/coco1.png'
+f = './data/coco4.png'
 z = e(f)
 #e.debug_rhip(z)
-e.kinematicTree(z)
+data = e.kinematicTree(z)
