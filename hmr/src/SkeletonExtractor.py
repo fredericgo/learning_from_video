@@ -109,11 +109,10 @@ class SkeletonExtractor:
         x = np.zeros(25)
         z_pelvis = (z[2] + z[3]) / 2.
         v_orig_l = normalize(np.array([0, 0, -0.3]))
-        v_y = normalize(z[3] - z[2])
-        v_z = normalize(z[12] - z_pelvis)
-        v_x = normalize(normal_vector(v_y, v_z))
+        v_x = normalize(z[1] - z[2])
+        v_z = normalize([0, -v_x[2], v_x[1]])
+        v_y = normalize(normal_vector(v_z, v_x))
         R = populateMatrix(v_x, v_y, v_z)
-
         v_new_g = normalize(z[0] - z[1])
         v_new_l = R.transpose().dot(v_new_g)
 
@@ -127,7 +126,7 @@ class SkeletonExtractor:
         ax.quiver(*zVec(v_z),color='blue')
         ax.scatter(*z[2])
         ax.scatter(*z[3])
-        ax.quiver(*zVec(v_new_g),color='yellow')
+        ax.quiver(*zVec(v_new_l),color='yellow')
 
         ax.set_xlim(-1,1)
         ax.set_ylim(-1,1)
@@ -188,9 +187,9 @@ class SkeletonExtractor:
 
         # 14: right knee
         v_new_g = normalize(z[0] - z[1])
-        v_y = normalize(z[1] - z[2])
-        v_x = normalize([0, v_y[3], v_y[2]])
-        v_z = normalize(normal_vector(v_x, v_y))
+        v_x = normalize(z[1] - z[2])
+        v_z = normalize([0, -v_y[2], v_y[1]])
+        v_z = normalize(normal_vector(v_z, v_x))
         R = populateMatrix(v_x, v_y, v_z)
         v_new_l = R.transpose().dot(v_new_g)
 
