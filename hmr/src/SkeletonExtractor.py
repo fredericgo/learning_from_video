@@ -21,6 +21,8 @@ from src.ik import (solve_l_hip_angles, solve_r_hip_angles,
 import matplotlib.pyplot as plt
 import quaternion
 
+from transforms3d.axangles import axangle2mat
+
 def inner_angle(v0, v1, degree=True):
     angle = np.math.atan2(np.linalg.norm(np.cross(v0, v1)),np.dot(v0, v1))
     if degree:
@@ -73,6 +75,9 @@ class SkeletonExtractor:
         # Add batch dimension: 1 x D x D x 3
         input_img = np.expand_dims(input_img, 0)
         joints, verts, cams, joints3d, theta = self._model.predict(input_img, get_theta=True)
+
+        R = axangle2mat([1,0,0], np.deg2rad(90))
+        joints3d = joints3d.dot(R)
         joints3d = joints3d[0,:14]
         return joints3d
         #self.kinematicTree(joints3d)

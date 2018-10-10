@@ -16,9 +16,11 @@ from src.tf_pose.get_people import get_people
 import tensorflow as tf
 from src.RunModel import RunModel
 import src.config
+from transforms3d.axangles import axangle2mat
+
 
 parser = argparse.ArgumentParser(description='tf-pose-estimation run')
-parser.add_argument('--image', type=str, default='./data/coco4.png')
+parser.add_argument('--image', type=str, default='./data/coco3.png')
 parser.add_argument('--model', type=str, default='mobilenet_thin', help='cmu / mobilenet_thin')
 
 parser.add_argument('--resize', type=str, default='0x0',
@@ -111,9 +113,9 @@ def p3d(joints, cam, proc_param):
     tz = flength / (0.5 * img_size * cam_s)
     trans = np.hstack([cam_pos, tz])
     #joints = joints + trans
+    R = axangle2mat([1,0,0], np.deg2rad(90))
+    joints = joints.dot(R)
     
-    y_temp = joints[:,1]
-    joints=-joints
 
     # plt.ion()
     plt.figure(1)
