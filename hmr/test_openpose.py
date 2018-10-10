@@ -18,7 +18,7 @@ from src.RunModel import RunModel
 import src.config
 
 parser = argparse.ArgumentParser(description='tf-pose-estimation run')
-parser.add_argument('--image', type=str, default='./data/coco1.png')
+parser.add_argument('--image', type=str, default='./data/coco4.png')
 parser.add_argument('--model', type=str, default='mobilenet_thin', help='cmu / mobilenet_thin')
 
 parser.add_argument('--resize', type=str, default='0x0',
@@ -100,6 +100,7 @@ def p3d(joints, cam, proc_param):
 
     import matplotlib.pyplot as plt
     from mpl_toolkits import mplot3d
+    print(joints.shape)
     joints = joints[0,:14,:]
 
     img_size = proc_param['img_size']
@@ -162,6 +163,7 @@ def main(img_path):
 
     joints, verts, cams, joints3d, theta = model.predict(
         input_img, get_theta=True)
+    print(joints3d.shape)
 
     p3d(joints3d, cams[0], proc_param)
     #visualize(img, proc_param, joints[0], verts[0], cams[0])

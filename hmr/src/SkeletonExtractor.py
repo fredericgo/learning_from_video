@@ -219,7 +219,7 @@ class SkeletonExtractor:
         v_x = normalize(normal_vector(v_y, v_z))
         R = populateMatrix(v_x, v_y, v_z)
 
-        v_new_g = normalize(z[8] - z[7])
+        v_new_g = normalize(z[7] - z[8])
         v_new_l = R.transpose().dot(v_new_g)
 
         a = solve_r_shoulder_angles(v_new_l)
