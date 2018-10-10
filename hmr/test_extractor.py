@@ -14,8 +14,9 @@ f = './data/coco2.png'
 z = e(f)
 #e.debug_rhip(z)
 #e.debug_rknee(z)
-e.debug_rotation(z)
+#e.debug_rotation(z)
 #data = e.kinematicTree(z)
 #print(data)
 
 #np.save('k_tree.npy', data)
+np.save('j3d.npy', z)

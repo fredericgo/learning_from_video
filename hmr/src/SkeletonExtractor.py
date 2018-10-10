@@ -107,13 +107,13 @@ class SkeletonExtractor:
 
     def debug_rotation(self, z):
         x = np.zeros(25)
-        z[:,0] = -z[:,0]
-        z[:,2] = -z[:,0]
-
-        v_y = normalize(z[9] - z[8])
+        z = -z
+        print(z[8],z[9])
+        v_y = normalize(z[8] - z[9])
         v_z = normalize(z[13] - z[12])
         v_x = normalize(normal_vector(v_y, v_z))
         R = populateMatrix(v_x, v_y, v_z)
+        print(R)
         q = quaternion.from_rotation_matrix(R)
 
         def zVec(v):
@@ -205,6 +205,7 @@ class SkeletonExtractor:
         R = populateMatrix(v_x, v_y, v_z)
         q = quaternion.from_rotation_matrix(R)
         x[4:8] = q.components
+
         # 8: abdomen z
         # 9: abdomen y
         # 10: abdomen x
@@ -271,7 +272,7 @@ class SkeletonExtractor:
         # 22: left shoulder 1
         # 23: left shoulder 2
         # original vector [0 0 0] -> [.16 .16 -.16]
-        v_y = normalize(z[9] - z[8])
+        v_y = normalize(z[8] - z[9])
         v_z = normalize(z[13] - z[12])
         v_x = normalize(normal_vector(v_y, v_z))
         R = populateMatrix(v_x, v_y, v_z)
