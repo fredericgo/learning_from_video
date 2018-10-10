@@ -105,6 +105,34 @@ class SkeletonExtractor:
         ax.set_zlim(-1,1)
         plt.show()
 
+    def debug_rotation(self, z):
+        x = np.zeros(25)
+        z[:,0] = -z[:,0]
+        z[:,2] = -z[:,0]
+
+        v_y = normalize(z[9] - z[8])
+        v_z = normalize(z[13] - z[12])
+        v_x = normalize(normal_vector(v_y, v_z))
+        R = populateMatrix(v_x, v_y, v_z)
+        q = quaternion.from_rotation_matrix(R)
+
+        def zVec(v):
+            return [0, 0, 0] + v.tolist()
+
+        fig = plt.figure()
+        ax = fig.add_subplot(111, projection='3d')
+        ax.quiver(*zVec(v_x),color='red')
+        ax.quiver(*zVec(v_y),color='green')
+        ax.quiver(*zVec(v_z),color='blue')
+        ax.scatter(*z[9])
+        ax.scatter(*z[8])
+        #ax.quiver(*zVec(v_new_g),color='yellow')
+
+        ax.set_xlim(-1,1)
+        ax.set_ylim(-1,1)
+        ax.set_zlim(-1,1)
+        plt.show()
+
     def debug_rknee(self, z):
         x = np.zeros(25)
         z_pelvis = (z[2] + z[3]) / 2.
@@ -167,6 +195,8 @@ class SkeletonExtractor:
         # 24: left elbow
 
         x = np.zeros(25)
+        z[:,0] = -z[:,0]
+        z[:,2] = -z[:,0]
         z_pelvis = (z[2] + z[3]) / 2.
 
         # 4-7: torso rotation
@@ -174,9 +204,8 @@ class SkeletonExtractor:
         v_z = normalize(z[13] - z[12])
         v_x = normalize(normal_vector(v_y, v_z))
         R = populateMatrix(v_x, v_y, v_z)
-        q = quaternion.from_rotaton_matrix(R)
-        x[4:8] = q
-
+        q = quaternion.from_rotation_matrix(R)
+        x[4:8] = q.components
         # 8: abdomen z
         # 9: abdomen y
         # 10: abdomen x

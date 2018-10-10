@@ -14,6 +14,7 @@ f = './data/coco2.png'
 z = e(f)
 #e.debug_rhip(z)
 #e.debug_rknee(z)
+#e.debug_rotation(z)
 data = e.kinematicTree(z)
 print(data)
 
