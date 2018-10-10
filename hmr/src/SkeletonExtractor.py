@@ -166,18 +166,18 @@ class SkeletonExtractor:
         z: 3D joint coordinates 14x3
         v: vectors
         """
-        # 0 right foot
-        # 1 right knee
-        # 2 right hip
-        # 3 left hip
-        # 4 left knee
-        # 5 left foot
-        # 6 right hand
-        # 7 right elbow
-        # 8 right shoulder
-        # 9 left shoulder
-        # 10 left elbow
-        # 11 left hand
+        # 0 l foot
+        # 1 l knee
+        # 2 l hip
+        # 3 r hip
+        # 4 r knee
+        # 5 r foot
+        # 6 l hand
+        # 7 l elbow
+        # 8 l shoulder
+        # 9 r shoulder
+        # 10 r elbow
+        # 11 r hand
         # 12 thorax
         # 13 head
 
@@ -199,7 +199,7 @@ class SkeletonExtractor:
         z_pelvis = (z[2] + z[3]) / 2.
 
         # 4-7: torso rotation
-        v_y = normalize(z[9] - z[8])
+        v_y = normalize(z[8] - z[9])
         v_z = normalize(z[13] - z[12])
         v_x = normalize(normal_vector(v_y, v_z))
         R = populateMatrix(v_x, v_y, v_z)
@@ -212,8 +212,8 @@ class SkeletonExtractor:
         # 11: right hip x
         # 12: right hip z
         # 13: right hip y
-        v_new_g = normalize(z[1] - z[2])
-        v_y = normalize(z[3] - z[2])
+        v_new_g = normalize(z[4] - z[3])
+        v_y = normalize(z[2] - z[3])
         v_z = normalize(z[12] - z_pelvis)
         v_x = normalize(normal_vector(v_y, v_z))
         R = populateMatrix(v_x, v_y, v_z)
@@ -221,28 +221,28 @@ class SkeletonExtractor:
         a = solve_r_hip_angles(v_new_l)
         x[11:14] = a
 
-        # 14: right knee
-        v_leg = normalize(z[0] - z[1])
-        v_thigh = normalize(z[1] - z[2])
+        # 14: r knee
+        v_leg = normalize(z[5] - z[4])
+        v_thigh = normalize(z[4] - z[3])
         a = inner_angle(v_leg, v_thigh)
         x[14] = -a
 
-        # 15: left hip x
-        # 16: left hip z
-        # 17: left hip y
+        # 15: l hip x
+        # 16: l hip z
+        # 17: l hip y
         # -1 0 0
-        v_y = normalize(z[3] - z[2])
+        v_y = normalize(z[2] - z[3])
         v_z = normalize(z[12] - z_pelvis)
         v_x = normalize(normal_vector(v_y, v_z))
         R = populateMatrix(v_x, v_y, v_z)
-        v_new_g = normalize(z[4] - z[3])
+        v_new_g = normalize(z[1] - z[2])
         v_new_l = R.transpose().dot(v_new_g)
         a = solve_l_hip_angles(v_new_l)
         x[15:18] = a
 
         # 18: left knee
-        v_leg = normalize(z[5] - z[4])
-        v_thigh = normalize(z[4] - z[3])
+        v_leg = normalize(z[1] - z[2])
+        v_thigh = normalize(z[0] - z[1])
         a = inner_angle(v_leg, v_thigh)
         x[18] = -a
 
@@ -250,7 +250,7 @@ class SkeletonExtractor:
         # 20: right shoulder 2
         # local y : vector pointing from right shoulder to left
         # local z : vector pointing from pelvis to thorax
-        v_y = normalize(z[9] - z[8])
+        v_y = normalize(z[8] - z[9])
         v_z = normalize(z[13] - z[12])
         v_x = normalize(normal_vector(v_y, v_z))
         R = populateMatrix(v_x, v_y, v_z)
@@ -276,15 +276,15 @@ class SkeletonExtractor:
         v_x = normalize(normal_vector(v_y, v_z))
         R = populateMatrix(v_x, v_y, v_z)
 
-        v_new_g = normalize(z[10] - z[9])
+        v_new_g = normalize(z[7] - z[8])
         v_new_l = normalize(R.transpose().dot(v_new_g))
         a = solve_l_shoulder_angles(v_new_l)
         x[22] = a[0]
         x[23] = a[1]
 
         # 24: left elbow
-        v_lowarm = normalize(z[11] - z[10])
-        v_upperarm = normalize(z[10] - z[9])
+        v_lowarm = normalize(z[6] - z[7])
+        v_upperarm = normalize(z[7] - z[8])
         a = inner_angle(v_upperarm, v_lowarm)
         x[24] = -a
 
