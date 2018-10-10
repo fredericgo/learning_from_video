@@ -19,7 +19,7 @@ from src.ik import (solve_l_hip_angles, solve_r_hip_angles,
                     solve_r_elbow_angles, solve_l_elbow_angles,
                     solve_l_knee_angles, solve_r_knee_angles)
 import matplotlib.pyplot as plt
-
+import quaternion
 
 def inner_angle(v0, v1, degree=True):
     angle = np.math.atan2(np.linalg.norm(np.cross(v0, v1)),np.dot(v0, v1))
@@ -168,6 +168,14 @@ class SkeletonExtractor:
 
         x = np.zeros(25)
         z_pelvis = (z[2] + z[3]) / 2.
+
+        # 4-7: torso rotation
+        v_y = normalize(z[9] - z[8])
+        v_z = normalize(z[13] - z[12])
+        v_x = normalize(normal_vector(v_y, v_z))
+        R = populateMatrix(v_x, v_y, v_z)
+        q = quaternion.from_rotaton_matrix(R)
+        x[4:8] = q
 
         # 8: abdomen z
         # 9: abdomen y
