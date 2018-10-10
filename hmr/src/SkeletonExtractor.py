@@ -195,8 +195,7 @@ class SkeletonExtractor:
         # 24: left elbow
 
         x = np.zeros(25)
-        z[:,0] = -z[:,0]
-        z[:,2] = -z[:,0]
+        z = -z
         z_pelvis = (z[2] + z[3]) / 2.
 
         # 4-7: torso rotation

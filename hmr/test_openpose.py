@@ -111,10 +111,9 @@ def p3d(joints, cam, proc_param):
     tz = flength / (0.5 * img_size * cam_s)
     trans = np.hstack([cam_pos, tz])
     #joints = joints + trans
-
-    joints[:,0] = -joints[:,0]
-    joints[:,2] = -joints[:,2]
-
+    
+    y_temp = joints[:,1]
+    joints=-joints
 
     # plt.ion()
     plt.figure(1)
@@ -124,7 +123,7 @@ def p3d(joints, cam, proc_param):
     #ax.scatter3D(joints[:,0],
     #          joints[:,1],
     #          joints[:,2], 'gray')
-    idx = 0 
+    idx = 13 
     ax.scatter3D(joints[idx,0],
                  joints[idx,1],
                  joints[idx,2], c='red', s=100)
