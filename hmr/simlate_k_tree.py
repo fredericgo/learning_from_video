@@ -8,15 +8,16 @@ sim = MjSim(model)
 viewer = MjViewer(sim)
 
 x = np.load('k_tree.npy')
-x_rad = np.deg2rad(x)
 
 sim_state = sim.get_state()
 print(x)
 
 while True:
     sim_state = sim.get_state()
+    for i in range(4, 8):
+        sim_state.qpos[i] = x[i]
     for i in range(11, 24):
-        sim_state.qpos[i] = x_rad[i]
+        sim_state.qpos[i] = np.deg2rad(x[i])
     sim.set_state(sim_state)
     sim.forward()
     #sim.step()
