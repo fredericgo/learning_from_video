@@ -112,8 +112,6 @@ class SkeletonExtractor:
 
     def debug_rotation(self, z):
         x = np.zeros(25)
-        z = -z
-        print(z[8],z[9])
         v_y = normalize(z[8] - z[9])
         v_z = normalize(z[13] - z[12])
         v_x = normalize(normal_vector(v_y, v_z))
@@ -200,11 +198,10 @@ class SkeletonExtractor:
         # 24: left elbow
 
         x = np.zeros(25)
-        z = -z
         z_pelvis = (z[2] + z[3]) / 2.
 
         # 4-7: torso rotation
-        v_y = normalize(z[8] - z[9])
+        v_y = normalize(z[9] - z[8])
         v_z = normalize(z[13] - z[12])
         v_x = normalize(normal_vector(v_y, v_z))
         R = populateMatrix(v_x, v_y, v_z)

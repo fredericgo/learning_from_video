@@ -125,7 +125,7 @@ def p3d(joints, cam, proc_param):
     #ax.scatter3D(joints[:,0],
     #          joints[:,1],
     #          joints[:,2], 'gray')
-    idx = 13 
+    idx = 12 
     ax.scatter3D(joints[idx,0],
                  joints[idx,1],
                  joints[idx,2], c='red', s=100)
