@@ -1,4 +1,5 @@
 models/
+output/
 logs*/
 *.json
 *.DS_Store
