@@ -20,7 +20,7 @@ from transforms3d.axangles import axangle2mat
 
 
 parser = argparse.ArgumentParser(description='tf-pose-estimation run')
-parser.add_argument('--image', type=str, default='./data/coco3.png')
+parser.add_argument('--image', type=str, default='./data/youtube/1/frame_004628.jpg')
 parser.add_argument('--model', type=str, default='mobilenet_thin', help='cmu / mobilenet_thin')
 
 parser.add_argument('--resize', type=str, default='0x0',

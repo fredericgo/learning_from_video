@@ -29,5 +29,5 @@ for i, file in enumerate(onlyfiles):
     data = e.kinematicTree(z)
     X[i] = data
 
-np.save('results/k_trees.npy', data)
+np.save('results/k_trees.npy', X)
 #np.save('j3d.npy', z)
