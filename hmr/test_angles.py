@@ -16,9 +16,10 @@ from src.tf_pose.get_people import get_people
 import tensorflow as tf
 from src.RunModel import RunModel
 import src.config
+import quaternion
 
 parser = argparse.ArgumentParser(description='tf-pose-estimation run')
-parser.add_argument('--image', type=str, default='./data/cam5_frame000153.jpg')
+parser.add_argument('--image', type=str, default='./data/coco3.png')
 parser.add_argument('--model', type=str, default='mobilenet_thin', help='cmu / mobilenet_thin')
 
 parser.add_argument('--resize', type=str, default='0x0',
@@ -51,7 +52,7 @@ def get_angles(joints, cam, proc_param):
     from mpl_toolkits import mplot3d
     joints = joints[0,:14,:]
 
-    print(joints)
+    #print(joints)
 
 def preprocess_image(img_path, kps):
     img = io.imread(img_path)
@@ -75,13 +76,17 @@ def main(img_path):
     kps = get_people(img_path)
 
     input_img, proc_param, img = preprocess_image(img_path, kps)
-    print(proc_param)
     # Add batch dimension: 1 x D x D x 3
     input_img = np.expand_dims(input_img, 0)
 
     joints, verts, cams, joints3d, theta = model.predict(
         input_img, get_theta=True)
 
+    theta = theta[0,3:75]
+    q = quaternion.from_rotation_vector(theta[3:6])
+    print(q)
+    q = quaternion.from_rotation_vector(theta[6:9])
+    print(q)
     get_angles(joints3d, cams[0], proc_param)
     #visualize(img, proc_param, joints[0], verts[0], cams[0])
 
