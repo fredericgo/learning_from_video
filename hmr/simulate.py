@@ -57,12 +57,10 @@ MODEL_XML = """
                         </body>
                     </body>
                     <body name="left_thigh" pos="0 0.1 -0.04">
-                        <joint armature="0.01" axis="-1 0 0" damping="5" name="left_hip_x" pos="0 0 0" range="-25 5" stiffness="10" type="hinge"/>
-                        <joint armature="0.01" axis="0 0 -1" damping="5" name="left_hip_z" pos="0 0 0" range="-60 35" stiffness="10" type="hinge"/>
-                        <joint armature="0.01" axis="0 1 0" damping="5" name="left_hip_y" pos="0 0 0" range="-120 20" stiffness="20" type="hinge"/>
+                        <joint armature="0.01" damping="5" name="left_hip" pos="0 0 0" stiffness="10" type="ball"/>
                         <geom fromto="0 0 0 0 -0.01 -.34" name="left_thigh1" size="0.06" type="capsule"/>
                         <body name="left_shin" pos="0 -0.01 -0.403">
-                            <joint armature="0.0060" axis="0 -1 0" name="left_knee" pos="0 0 .02" range="-160 -2" stiffness="1" type="hinge"/>
+                            <joint armature="0.0060" name="left_knee" pos="0 0 .02" stiffness="1" type="ball"/>
                             <geom fromto="0 0 0 0 0 -.3" name="left_shin1" size="0.049" type="capsule"/>
                             <body name="left_foot" pos="0 0 -0.45">
                                 <geom name="left_foot" type="sphere" size="0.075" pos="0 0 0.1" user="0" />
@@ -96,7 +94,7 @@ MODEL_XML = """
     </worldbody>
     <tendon>
         <fixed name="left_hipknee">
-            <joint coef="-1" joint="left_hip_y"/>
+            <joint coef="-1" joint="left_hip"/>
             <joint coef="1" joint="left_knee"/>
         </fixed>
         <fixed name="right_hipknee">
@@ -111,9 +109,7 @@ MODEL_XML = """
         <motor gear="100" joint="abdomen_x" name="abdomen_x"/>
         <motor gear="100" joint="right_hip" name="right_hip"/>
         <motor gear="200" joint="right_knee" name="right_knee"/>
-        <motor gear="100" joint="left_hip_x" name="left_hip_x"/>
-        <motor gear="100" joint="left_hip_z" name="left_hip_z"/>
-        <motor gear="300" joint="left_hip_y" name="left_hip_y"/>
+        <motor gear="100" joint="left_hip" name="left_hip"/>
         <motor gear="200" joint="left_knee" name="left_knee"/>
         <motor gear="25" joint="right_shoulder1" name="right_shoulder1"/>
         <motor gear="25" joint="right_shoulder2" name="right_shoulder2"/>
@@ -132,15 +128,18 @@ viewer = MjViewer(sim)
 x = np.load('results/k_tree.npy')
 
 sim_state = sim.get_state()
-print(sim_state.qpos.shape)
+print(sim_state.qpos)
 
 step = 0
 while True:
     sim_state = sim.get_state()
     #for i in range(3, 7):
     #    sim_state.qpos[i] = y[i]
-    for i in range(11, 24):
+    print(sim_state.qpos)
+
+    for i in range(10, 24):
         sim_state.qpos[i] = np.deg2rad(x[i])
+
     sim.set_state(sim_state)
     sim.forward()
     #sim.step()
