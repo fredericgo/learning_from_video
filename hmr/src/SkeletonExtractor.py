@@ -79,7 +79,7 @@ class SkeletonExtractor:
         R = axangle2mat([1,0,0], np.deg2rad(90))
         joints3d = joints3d.dot(R)
         joints3d = joints3d[0,:14]
-        return joints3d
+        return joints3d, theta[0,3:75]
         #self.kinematicTree(joints3d)
 
     def debug_rhip(self, z):
@@ -322,3 +322,42 @@ class SkeletonExtractor:
         x[24] = a - 70
 
         return x[1:]
+
+    def kt(self, theta):
+        """
+        z: 3D joint coordinates 14x3
+        v: vectors
+        """
+        # 0 r foot
+        # 1 r knee
+        # 2 r hip
+        # 3 l hip
+        # 4 l knee
+        # 5 l foot
+        # 6 r hand
+        # 7 r elbow
+        # 8 r shoulder
+        # 9 l shoulder
+        # 10 l elbow
+        # 11 l hand
+        # 12 thorax
+        # 13 head
+
+        ## GYM joints
+        # 1-3: torso x,y,z
+        # 4-7: torso rotation
+        # 8-10: abdomen (z,y,x)
+        # 11-13: right hip (x,z,y)
+        # 14: right knee
+        # 15-17: left hip (x,z,y)
+        # 18: left knee
+        # 19-20: right shoulder (1,2)
+        # 21: right elbow
+        # 22-23: left shoulder (1,2)
+        # 24: left elbow
+        x = np.zeros(26)
+        q = quaternion.from_rotation_vector(theta[6:9])
+        q = q.components
+        q[1], q[2], q[3] = q[3], q[1], q[2]
+        x[11:15] = q
+        return x
