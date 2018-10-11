@@ -298,7 +298,7 @@ class SkeletonExtractor:
         v_lowarm = normalize(z[6] - z[7])
         v_upperarm = normalize(z[7] - z[8])
         a = inner_angle(v_upperarm, v_lowarm)
-        x[21] = -a
+        x[21] = a - 70
 
         # 22: left shoulder 1
         # 23: left shoulder 2
@@ -315,9 +315,10 @@ class SkeletonExtractor:
         x[23] = a[1]
 
         # 24: left elbow
+
         v_lowarm = normalize(z[10] - z[9])
         v_upperarm = normalize(z[11] - z[10])
         a = inner_angle(v_upperarm, v_lowarm)
-        x[24] = -a
+        x[24] = a - 70
 
         return x[1:]
