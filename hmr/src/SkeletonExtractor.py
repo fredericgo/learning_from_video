@@ -347,17 +347,28 @@ class SkeletonExtractor:
         # 1-3: torso x,y,z
         # 4-7: torso rotation
         # 8-10: abdomen (z,y,x)
-        # 11-13: right hip (x,z,y)
-        # 14: right knee
-        # 15-17: left hip (x,z,y)
-        # 18: left knee
-        # 19-20: right shoulder (1,2)
-        # 21: right elbow
-        # 22-23: left shoulder (1,2)
-        # 24: left elbow
+        # 11-14: right hip (x,z,y)
+        # 15: right knee
+        # 16-19: left hip (x,z,y)
+        # 20-23: left knee
+        # 24-25: right shoulder (1,2)
+        # 26: right elbow
+        # 27-28: left shoulder (1,2)
+        # 29: left elbow
+
         x = np.zeros(26)
+        q = quaternion.from_rotation_vector(theta[3:6])
+        q = q.components
+        q[1], q[2], q[3] = q[3], q[1], q[2]
+        x[16:20] = q
+
         q = quaternion.from_rotation_vector(theta[6:9])
         q = q.components
         q[1], q[2], q[3] = q[3], q[1], q[2]
         x[11:15] = q
-        return x
+
+        q = quaternion.from_rotation_vector(theta[12:15])
+        q = q.components
+        q[1], q[2], q[3] = q[3], q[1], q[2]
+        x[20:24] = q
+        return x[1:]

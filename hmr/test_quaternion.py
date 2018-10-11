@@ -1,4 +1,4 @@
-rom absl import flags
+from absl import flags
 import src.config
 import sys
 from src.SkeletonExtractor import SkeletonExtractor
@@ -10,8 +10,8 @@ config.load_path = src.config.PRETRAINED_MODEL
 config.batch_size = 1
 
 e = SkeletonExtractor(config)
-f = './data/youtube/1/frame_004628.jpg'
+f = './data/coco3.png'
 z, theta = e(f)
 data = e.kt(theta)
-np.save('k_tree.npy', data)
+np.save('results/k_tree.npy', data)
 #np.save('j3d.npy', z)
