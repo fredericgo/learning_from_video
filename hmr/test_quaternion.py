@@ -40,15 +40,17 @@ def to_euler_xyz(x):
     a = euler.quat2euler(q)
     return a
 
-def to_angle(x):
+def to_one_angle(x):
     th = np.linalg.norm(x)
     return th
 
-z = np.zeros((30, 3))
+z = np.zeros(30)
 for joi, num in joints.items():
     print("{}:".format(joi))
     x = theta[num]
-    if joi in ['L_Elbow', 'R_Elbow', 'L_Knee', 'R_Knee']:
+    if joi in ['L_Elbow', 'L_Knee']:
+        a = -to_angle(x)
+    elif joi in ['R_Elbow', 'R_Knee']:
         a = to_angle(x)
     else:
         a = to_euler_xyz(x)
