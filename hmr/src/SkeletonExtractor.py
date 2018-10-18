@@ -346,29 +346,51 @@ class SkeletonExtractor:
         ## GYM joints
         # 1-3: torso x,y,z
         # 4-7: torso rotation
-        # 8-10: abdomen (z,y,x)
-        # 11-14: right hip (x,z,y)
-        # 15: right knee
-        # 16-19: left hip (x,z,y)
-        # 20-23: left knee
-        # 24-25: right shoulder (1,2)
-        # 26: right elbow
-        # 27-28: left shoulder (1,2)
-        # 29: left elbow
+        # 8-11: abdomen (z,y,x)
+        # 12-15: right hip (x,z,y)
+        # 16-19: right knee
+        # 20-23: left hip (x,z,y)
+        # 24-27: left knee
+        # 28-29: right shoulder (1,2)
+        # 30: right elbow
+        # 31-32: left shoulder (1,2)
+        # 33: left elbow
 
-        x = np.zeros(26)
+        x = np.zeros(32)
+        # root rotation
+        q = quaternion.from_rotation_vector(theta[0:3])
+        q2 = quaternion.from_rotation_vector([np.pi,0,0])*q
+        q = q2.components
+        q[1], q[2], q[3] = q[3], q[1], q[2]
+        x[4:8] = q
+
+        # abdomen
+        q = quaternion.from_rotation_vector(theta[9:12])
+        q = q.components
+        q[1], q[2], q[3] = q[3], q[1], q[2]
+        x[8:12] = q
+
+        #l hip
         q = quaternion.from_rotation_vector(theta[3:6])
         q = q.components
         q[1], q[2], q[3] = q[3], q[1], q[2]
-        x[16:20] = q
+        x[20:24] = q
 
+        # r hip
         q = quaternion.from_rotation_vector(theta[6:9])
         q = q.components
         q[1], q[2], q[3] = q[3], q[1], q[2]
-        x[11:15] = q
+        x[12:16] = q
 
+        # l knee
         q = quaternion.from_rotation_vector(theta[12:15])
         q = q.components
         q[1], q[2], q[3] = q[3], q[1], q[2]
-        x[20:24] = q
+        x[24:28] = q
+
+        # r knee
+        q = quaternion.from_rotation_vector(theta[15:18])
+        q = q.components
+        q[1], q[2], q[3] = q[3], q[1], q[2]
+        x[16:20] = q
         return x[1:]
