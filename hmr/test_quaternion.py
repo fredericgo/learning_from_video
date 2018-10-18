@@ -26,10 +26,10 @@ joints = {
 
 
 target_joints = {
-    'L_Shoulder': [4,5,6],
-    'R_Shoulder': [10,11,12],
-    'L_Hip': [16,17,18],
-    'R_Hip': [23,24,25],
+    'L_Shoulder': [4,5,6],    'L_Elbow': [9],
+    'R_Shoulder': [10,11,12], 'R_Elbow': [15],
+    'L_Hip': [16,17,18],      'L_Knee': [21],
+    'R_Hip': [23,24,25],      'R_Knee': [28]
 }
 
 def to_euler_xyz(x):
@@ -40,12 +40,19 @@ def to_euler_xyz(x):
     a = euler.quat2euler(q)
     return a
 
+def to_angle(x):
+    th = np.linalg.norm(x)
+    return th
+
 z = np.zeros((30, 3))
 for joi, num in joints.items():
     print("{}:".format(joi))
     x = theta[num]
-    a = to_euler_xyz(x)
-    z[target_joints[num]] = a
+    if joi in ['L_Elbow', 'R_Elbow', 'L_Knee', 'R_Knee']:
+        a = to_angle(x)
+    else:
+        a = to_euler_xyz(x)
+    z[target_joints[joi]] = a
 
 np.save('k_tree.npy', z)
 #np.save('j3d.npy', z)
