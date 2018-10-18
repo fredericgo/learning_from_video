@@ -16,17 +16,36 @@ e = SkeletonExtractor(config)
 f = './data/coco1.png'
 z, theta = e(f)
 theta = theta.reshape((-1,3))
-print(theta)
-x = theta[1]
-th = np.linalg.norm(x)
-x[0], x[1], x[2] = x[2], x[0], x[1]
-x /= th
-print(x)
-print(th)
-q = quaternions.axangle2quat(x, th)
-a = euler.quat2euler(q)
-print(q)
-print(a)
 
-#np.save('results/k_tree.npy', data)
+joints = {
+    'L_Shoulder': 16, 'L_Elbow': 18,
+    'R_Shoulder': 17, 'R_Elbow': 19,
+    'L_Hip': 1,       'L_Knee': 4,
+    'R_Hip': 2,       'R_Knee': 5
+}
+
+
+target_joints = {
+    'L_Shoulder': [4,5,6],
+    'R_Shoulder': [10,11,12],
+    'L_Hip': [16,17,18],
+    'R_Hip': [23,24,25],
+}
+
+def to_euler_xyz(x):
+    x[0], x[1], x[2] = x[2], x[0], x[1]
+    th = np.linalg.norm(x)
+    x_norm = x / th
+    q = quaternions.axangle2quat(x, th)
+    a = euler.quat2euler(q)
+    return a
+
+z = np.zeros((30, 3))
+for joi, num in joints.items():
+    print("{}:".format(joi))
+    x = theta[num]
+    a = to_euler_xyz(x)
+    z[target_joints[num]] = a
+
+np.save('k_tree.npy', z)
 #np.save('j3d.npy', z)
