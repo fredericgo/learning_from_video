@@ -13,11 +13,12 @@ config.load_path = src.config.PRETRAINED_MODEL
 config.batch_size = 1
 
 e = SkeletonExtractor(config)
-f = './data/coco1.png'
+f = './data/coco5.png'
 z, theta = e(f)
 theta = theta.reshape((-1,3))
 
 joints = {
+    'Spine1': 3,
     'L_Shoulder': 16, 'L_Elbow': 18,
     'R_Shoulder': 17, 'R_Elbow': 19,
     'L_Hip': 1,       'L_Knee': 4,
@@ -26,10 +27,11 @@ joints = {
 
 
 target_joints = {
-    'L_Shoulder': [4,5,6],    'L_Elbow': [9],
-    'R_Shoulder': [10,11,12], 'R_Elbow': [15],
-    'L_Hip': [16,17,18],      'L_Knee': [21],
-    'R_Hip': [23,24,25],      'R_Knee': [28]
+    'Spine1': [0,1,2],
+    'L_Shoulder': [6,7,8],    'L_Elbow': [11],
+    'R_Shoulder': [12,13,14], 'R_Elbow': [17],
+    'L_Hip': [18,19,20],      'L_Knee': [23],
+    'R_Hip': [25,26,27],      'R_Knee': [30]
 }
 
 def to_euler_xyz(x):
@@ -40,20 +42,21 @@ def to_euler_xyz(x):
     a = euler.quat2euler(q)
     return a
 
-def to_one_angle(x):
+def to_angle(x):
     th = np.linalg.norm(x)
     return th
 
-z = np.zeros(30)
+z = np.zeros(31)
 for joi, num in joints.items():
     print("{}:".format(joi))
     x = theta[num]
-    if joi in ['L_Elbow', 'L_Knee']:
+    if joi in ['L_Elbow']:
         a = -to_angle(x)
-    elif joi in ['R_Elbow', 'R_Knee']:
+    elif joi in ['R_Elbow', 'R_Knee', 'L_Knee']:
         a = to_angle(x)
     else:
         a = to_euler_xyz(x)
+    print(a)
     z[target_joints[joi]] = a
 
 np.save('k_tree.npy', z)
