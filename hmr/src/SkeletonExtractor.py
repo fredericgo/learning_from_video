@@ -76,6 +76,9 @@ class SkeletonExtractor:
     def __init__(self, config):
         self.sess = tf.Session()
         self._model = RunModel(config, sess=self.sess)
+        self.num_cam = 3
+        self.num_theta = 72
+
 
     def __call__(self, img_path):
         kps = get_people(img_path)
@@ -118,7 +121,7 @@ class SkeletonExtractor:
         # 21: right elbow
         # 22-23: left shoulder (1,2)
         # 24: left elbow
-
+        theta = theta[self.num_cam:(self.num_cam + self.num_theta)]
         theta = theta.reshape((-1,3))
         z = np.zeros(32)
         for joi, num in joints.items():
