@@ -25,7 +25,6 @@ joints = {
     'R_Hip': 2,       'R_Knee': 5
 }
 
-
 target_joints = {
     'Spine1': [0,1,2],
     'L_Shoulder': [6,7,8],    'L_Elbow': [11],
@@ -46,7 +45,7 @@ def to_angle(x):
     th = np.linalg.norm(x)
     return th
 
-z = np.zeros(31)
+z = np.zeros(32)
 for joi, num in joints.items():
     print("{}:".format(joi))
     x = theta[num]

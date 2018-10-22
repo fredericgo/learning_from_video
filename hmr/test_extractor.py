@@ -12,11 +12,5 @@ config.batch_size = 1
 e = SkeletonExtractor(config)
 f = './data/youtube/1/frame_004628.jpg'
 z = e(f)
-#e.debug_rhip(z)
-e.debug_rshoulder(z)
-#e.debug_rotation(z)
-data = e.kinematicTree(z)
-print(data)
-
-np.save('k_tree.npy', data)
-#np.save('j3d.npy', z)
+print(z)
+np.save('k_tree.npy', z)
