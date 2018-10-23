@@ -132,18 +132,31 @@ class MotionReconstructionModel(object):
         self.saver.restore(self.sess, self.load_path)
         self.mean_value = self.sess.run(self.mean_var)
 
-    def predict(self, images, get_theta=False):
+    def predict(self, images):
         """
         images: num_batch, img_size, img_size, 3
         Preprocessed to range [-1, 1]
         """
-        results = self.predict_dict(images)
-        if get_theta:
-            return results['joints'], results['verts'], results['cams'], results[
-                'joints3d'], results['theta']
-        else:
-            return results['joints'], results['verts'], results['cams'], results[
-                'joints3d']
+        n = images.shape[0]
+        
+        res = []
+        b = np.zeros((self.batch_size, self.img_size, self.img_size, 3))
+        for i in range(0, n, self.batch_size):
+            nb = images[i:i+self.batch_size].shape[0]
+            b[:nb] = images[i:i+self.batch_size]
+            out = self.predict_dict(b)
+            out = { k: v[:nb] for k, v in out.items()}
+            res.append(out)
+
+        results = {}
+        results['joints'] = np.concatenate([v['joints'] for v in res])
+        results['verts'] = np.concatenate([v['verts'] for v in res])
+        results['cams'] = np.concatenate([v['cams'] for v in res])
+        results['joints3d'] = np.concatenate([v['joints3d'] for v in res])
+        results['theta'] = np.concatenate([v['theta'] for v in res])
+
+        return results
+
 
     def predict_dict(self, images):
         """
