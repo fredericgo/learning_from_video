@@ -13,7 +13,7 @@ from src.util import openpose as op_util
 
 from src.tf_pose.get_people import get_people
 import tensorflow as tf
-from .RunModel import RunModel
+from .MotionReconstructionModel import MotionReconstructionModel 
 import src.config as config
 import matplotlib.pyplot as plt
 
@@ -64,12 +64,15 @@ def preprocess_image(img_path, kps):
 class MoRecSkeletonExtractor:
     def __init__(self, config):
         self.sess = tf.Session()
-        self._model = RunModel(config, sess=self.sess)
+        self._model = MotionReconstructionModel(config, sess=self.sess)
         self.num_cam = 3
         self.num_theta = 72
+        self.picture_size = 224
+        self.num_channels = 3
 
     def __call__(self, img_path):
-        self._preprocess(img_path)
+        input_img = self._preprocess(img_path)
+        self._model.predict(input_img)
         #joints, verts, cams, joints3d, theta = self._model.predict(input_img, get_theta=True)
         # theta SMPL angles
         #return self.kinematicTree(theta[0])
@@ -81,9 +84,7 @@ class MoRecSkeletonExtractor:
                            key=lambda f: int(f.rsplit('.')[0].split('_')[-1]))
 
         N = len(onlyfiles)
-        X = np.zeros((N, 32))
-
-        print(N)
+        X = np.zeros((N, self.picture_size, self.picture_size, 3))
         for i, file in enumerate(onlyfiles):
             print("File: {}".format(file))
             img_path = os.path.join(img_dir, file)
@@ -91,6 +92,9 @@ class MoRecSkeletonExtractor:
             input_img, proc_param, img = preprocess_image(img_path, kps)
             # Add batch dimension: 1 x D x D x 3
             input_img = np.expand_dims(input_img, 0)
+            X[i] = input_img
+        return X
+
 
     def kinematicTree(self, theta):
         """

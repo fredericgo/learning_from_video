@@ -8,7 +8,7 @@ import numpy as np
 config = flags.FLAGS
 config(sys.argv)
 config.load_path = src.config.PRETRAINED_MODEL
-config.batch_size = 1
+#config.batch_size = 1
 
 e = MoRecSkeletonExtractor(config)
 
