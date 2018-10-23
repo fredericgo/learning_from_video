@@ -22,6 +22,7 @@ import matplotlib.pyplot as plt
 import quaternion
 
 from transforms3d.axangles import axangle2mat
+from transforms3d import quaternions, euler
 
 joints = {
     'Spine1': 3,
@@ -87,7 +88,7 @@ class SkeletonExtractor:
         input_img = np.expand_dims(input_img, 0)
         joints, verts, cams, joints3d, theta = self._model.predict(input_img, get_theta=True)
         # theta SMPL angles
-        return self.kinematicTree(theta)
+        return self.kinematicTree(theta[0])
 
     def kinematicTree(self, theta):
         """
