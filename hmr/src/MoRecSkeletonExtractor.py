@@ -2,6 +2,7 @@ import argparse
 import logging
 import sys
 import time
+import os
 
 from absl import flags
 import cv2
@@ -14,12 +15,7 @@ from src.tf_pose.get_people import get_people
 import tensorflow as tf
 from .RunModel import RunModel
 import src.config as config
-from src.ik import (solve_l_hip_angles, solve_r_hip_angles,
-                    solve_l_shoulder_angles, solve_r_shoulder_angles,
-                    solve_r_elbow_angles, solve_l_elbow_angles,
-                    solve_l_knee_angles, solve_r_knee_angles)
 import matplotlib.pyplot as plt
-import quaternion
 
 from transforms3d.axangles import axangle2mat
 from transforms3d import quaternions, euler
@@ -65,7 +61,7 @@ def preprocess_image(img_path, kps):
 
     return crop, proc_param, img
 
-class MocRecSkeletonExtractor:
+class MoRecSkeletonExtractor:
     def __init__(self, config):
         self.sess = tf.Session()
         self._model = RunModel(config, sess=self.sess)
@@ -87,6 +83,7 @@ class MocRecSkeletonExtractor:
         N = len(onlyfiles)
         X = np.zeros((N, 32))
 
+        print(N)
         for i, file in enumerate(onlyfiles):
             print("File: {}".format(file))
             img_path = os.path.join(img_dir, file)

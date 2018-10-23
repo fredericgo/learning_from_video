@@ -13,7 +13,7 @@ config.batch_size = 1
 e = MoRecSkeletonExtractor(config)
 
 img_dir = "data/youtube/1/"
-z = e(img_path)
+z = e(img_dir)
 
 #np.save('results/k_trees.npy', X)
 #np.save('j3d.npy', z)
