@@ -40,12 +40,6 @@ target_joints = {
     'R_Hip': [25,26,27],      'R_Knee': [30]
 }
 
-def normalize(v):
-    return v / np.linalg.norm(v)
-
-def normal_vector(v1, v2):
-    return np.cross(v1, v2)
-
 def to_euler_xyz(x):
     x[0], x[1], x[2] = x[2], x[0], x[1]
     th = np.linalg.norm(x)
@@ -64,31 +58,42 @@ def preprocess_image(img_path, kps):
         img = img[:, :, :3]
 
     scale, center = op_util.get_bbox_dict(kps)
-
     crop, proc_param = img_util.scale_and_crop(img, scale, center,
                                                224)
-
     # Normalize image to [-1, 1]
     crop = 2 * ((crop / 255.) - 0.5)
 
     return crop, proc_param, img
 
-class SkeletonExtractor:
+class MocRecSkeletonExtractor:
     def __init__(self, config):
         self.sess = tf.Session()
         self._model = RunModel(config, sess=self.sess)
         self.num_cam = 3
         self.num_theta = 72
 
-
     def __call__(self, img_path):
-        kps = get_people(img_path)
-        input_img, proc_param, img = preprocess_image(img_path, kps)
-        # Add batch dimension: 1 x D x D x 3
-        input_img = np.expand_dims(input_img, 0)
-        joints, verts, cams, joints3d, theta = self._model.predict(input_img, get_theta=True)
+        self._preprocess(img_path)
+        #joints, verts, cams, joints3d, theta = self._model.predict(input_img, get_theta=True)
         # theta SMPL angles
-        return self.kinematicTree(theta[0])
+        #return self.kinematicTree(theta[0])
+
+    def _preprocess(self, img_dir):
+        onlyfiles = [f for f in os.listdir(img_dir)
+                     if os.path.isfile(os.path.join(img_dir, f))]
+        onlyfiles = sorted(onlyfiles,
+                           key=lambda f: int(f.rsplit('.')[0].split('_')[-1]))
+
+        N = len(onlyfiles)
+        X = np.zeros((N, 32))
+
+        for i, file in enumerate(onlyfiles):
+            print("File: {}".format(file))
+            img_path = os.path.join(img_dir, file)
+            kps = get_people(img_path)
+            input_img, proc_param, img = preprocess_image(img_path, kps)
+            # Add batch dimension: 1 x D x D x 3
+            input_img = np.expand_dims(input_img, 0)
 
     def kinematicTree(self, theta):
         """

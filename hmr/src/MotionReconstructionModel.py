@@ -58,6 +58,7 @@ class MotionReconstructionModel(object):
         # self.theta0_pl = tf.placeholder_with_default(
         #     self.load_mean_param(), shape=[self.batch_size, self.total_params], name='theta0')
         # self.theta0_pl = tf.placeholder(tf.float32, shape=[None, self.total_params], name='theta0')
+        self.img_enc_fn, self.threed_enc_fn = get_encoder_fn_separate(self.model_type)
 
         self.build_test_model_ief()
 
@@ -75,11 +76,10 @@ class MotionReconstructionModel(object):
         # Load mean value
         self.mean_var = tf.Variable(tf.zeros((1, self.total_params)), name="mean_param", dtype=tf.float32)
 
-        img_enc_fn, threed_enc_fn = get_encoder_fn_separate(self.model_type)
         # Extract image features.
-        self.img_feat, self.E_var = img_enc_fn(self.images_pl,
-                                               is_training=False,
-                                               reuse=False)
+        self.img_feat, self.E_var = self.img_enc_fn(self.images_pl,
+                                                    is_training=False,
+                                                    reuse=False)
 
         # Start loop
         self.all_verts = []
@@ -94,13 +94,13 @@ class MotionReconstructionModel(object):
             state = tf.concat([self.img_feat, theta_prev], 1)
 
             if i == 0:
-                delta_theta, _ = threed_enc_fn(
+                delta_theta, _ = self.threed_enc_fn(
                     state,
                     num_output=self.total_params,
                     is_training=False,
                     reuse=False)
             else:
-                delta_theta, _ = threed_enc_fn(
+                delta_theta, _ = self.threed_enc_fn(
                     state,
                     num_output=self.total_params,
                     is_training=False,
