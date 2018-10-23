@@ -12,7 +12,7 @@ from src.util import openpose as op_util
 
 from src.tf_pose.get_people import get_people
 import tensorflow as tf
-from .RunModel import RunModel
+from .MotionReconstructionModel import MotionReconstructionModel
 import src.config as config
 from src.ik import (solve_l_hip_angles, solve_r_hip_angles,
                     solve_l_shoulder_angles, solve_r_shoulder_angles,
@@ -75,7 +75,7 @@ def preprocess_image(img_path, kps):
 class SkeletonExtractor:
     def __init__(self, config):
         self.sess = tf.Session()
-        self._model = RunModel(config, sess=self.sess)
+        self._model = MotionReconstructionModel(config, sess=self.sess)
         self.num_cam = 3
         self.num_theta = 72
 
