@@ -13,7 +13,7 @@ from src.util import openpose as op_util
 
 from src.tf_pose.get_people import get_people
 import tensorflow as tf
-from .MotionReconstructionModel import MotionReconstructionModel 
+from .MotionReconstructionModel import MotionReconstructionModel
 import src.config as config
 import matplotlib.pyplot as plt
 
@@ -72,7 +72,7 @@ class MoRecSkeletonExtractor:
 
     def __call__(self, img_path):
         input_img = self._preprocess(img_path)
-        self._model.predict(input_img)
+        return self._model.predict(input_img)
         #joints, verts, cams, joints3d, theta = self._model.predict(input_img, get_theta=True)
         # theta SMPL angles
         #return self.kinematicTree(theta[0])

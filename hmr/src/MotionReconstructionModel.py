@@ -137,8 +137,18 @@ class MotionReconstructionModel(object):
         images: num_batch, img_size, img_size, 3
         Preprocessed to range [-1, 1]
         """
-        n = images.shape[0]
+        results = self.initial_predict(images)
         
+        return results
+
+
+    def initial_predict(self, images):
+        """
+        images: num_batch, img_size, img_size, 3
+        Preprocessed to range [-1, 1]
+        """
+        n = images.shape[0]
+
         res = []
         b = np.zeros((self.batch_size, self.img_size, self.img_size, 3))
         for i in range(0, n, self.batch_size):
