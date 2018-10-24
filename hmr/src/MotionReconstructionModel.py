@@ -116,7 +116,7 @@ class MotionReconstructionModel(object):
             poses = theta_here[:, self.num_cam:(self.num_cam + self.num_theta)]
             shapes = theta_here[:, (self.num_cam + self.num_theta):]
 
-            verts, Js, _ = self.smpl(shapes, poses, get_skin=True)
+            verts, Js, _, _ = self.smpl(shapes, poses, get_skin=True)
 
             # Project to 2D!
             pred_kp = self.proj_fn(Js, cams, name='proj_2d_stage%d' % i)
@@ -160,10 +160,10 @@ class MotionReconstructionModel(object):
         cams = theta_here[:, :self.num_cam]
         poses = theta_here[:, self.num_cam:(self.num_cam + self.num_theta)]
         shapes = theta_here[:, (self.num_cam + self.num_theta):]
-        verts, Js, _ = self.smpl(shapes, poses, get_skin=True)
+        verts, Js, _, J3d = self.smpl(shapes, poses, get_skin=True)
         # Project to 2D!
         pred_kp = self.proj_fn(Js, cams, name='proj_2d_stage%d' % i)
-        return pred_kp, poses        
+        return pred_kp, poses, J3d
 
     def prepare(self):
         print('Restoring checkpoint %s..' % self.load_path)
@@ -182,9 +182,11 @@ class MotionReconstructionModel(object):
         x2d0 = results['joints']
         q3d0 = results['theta'][:,self.num_cam:(self.num_cam + self.num_theta)]
         z0 = results['hidden']
-        x2d, q3d = self.morec_model(z0, x2d0)
+        x2d, q3d, J3d = self.morec_model(z0, x2d0)
         l_2d = tf.reduce_sum(tf.abs(x2d-x2d0))
         l_3d = tf.reduce_sum(tf.abs(q3d-q3d0))
+        l_sm = J3d[1:]-J3d[:-1]
+        print(l_sm)
         loss = l_2d + l_3d
 
         optimizer = tf.train.GradientDescentOptimizer(0.01)
