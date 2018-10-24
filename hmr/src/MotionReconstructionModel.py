@@ -73,7 +73,6 @@ class MotionReconstructionModel(object):
 
         # motion reconstruction model setting
         self.num_hidden = 2048
-        self.morec_model()
 
 
     def build_test_model_ief(self):
@@ -130,9 +129,9 @@ class MotionReconstructionModel(object):
             # Finally)update to end iteration.
             theta_prev = theta_here
 
-    def morec_model(self):
-        z = tf.get_variable("Z", shape=(None, self.num_hidden))
-        theta_prev = tf.tile(self.mean_var, [None, 1])
+    def morec_model(self, num_steps):
+        z = tf.get_variable("Z", shape=(num_steps, self.num_hidden))
+        theta_prev = tf.tile(self.mean_var, [num_steps, 1])
         for i in np.arange(self.num_stage):
             print('Iteration %d' % i)
             # ---- Compute outputs
@@ -143,7 +142,7 @@ class MotionReconstructionModel(object):
                     state,
                     num_output=self.total_params,
                     is_training=False,
-                    reuse=False)
+                    reuse=True)
             else:
                 delta_theta, _ = self.threed_enc_fn(
                     state,
@@ -163,6 +162,7 @@ class MotionReconstructionModel(object):
         verts, Js, _ = self.smpl(shapes, poses, get_skin=True)
         # Project to 2D!
         pred_kp = self.proj_fn(Js, cams, name='proj_2d_stage%d' % i)
+        return pred_kp        
 
     def prepare(self):
         print('Restoring checkpoint %s..' % self.load_path)
@@ -175,7 +175,9 @@ class MotionReconstructionModel(object):
         images: num_batch, img_size, img_size, 3
         Preprocessed to range [-1, 1]
         """
+        num_steps = len(images)
         results = self.initial_predict(images)
+        x2d = self.morec_model(num_steps)
 
         return results
 
