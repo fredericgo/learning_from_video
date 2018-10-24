@@ -129,8 +129,9 @@ class MotionReconstructionModel(object):
             # Finally)update to end iteration.
             theta_prev = theta_here
 
-    def morec_model(self, num_steps):
-        z = tf.get_variable("Z", shape=(num_steps, self.num_hidden))
+    def morec_model(self, z0, x2d0):
+        num_steps = z0.shape[0]
+        z = tf.get_variable("Z", initializer=tf.constant(z0))
         theta_prev = tf.tile(self.mean_var, [num_steps, 1])
         for i in np.arange(self.num_stage):
             print('Iteration %d' % i)
@@ -162,7 +163,7 @@ class MotionReconstructionModel(object):
         verts, Js, _ = self.smpl(shapes, poses, get_skin=True)
         # Project to 2D!
         pred_kp = self.proj_fn(Js, cams, name='proj_2d_stage%d' % i)
-        return pred_kp        
+        return pred_kp, poses        
 
     def prepare(self):
         print('Restoring checkpoint %s..' % self.load_path)
@@ -175,9 +176,24 @@ class MotionReconstructionModel(object):
         images: num_batch, img_size, img_size, 3
         Preprocessed to range [-1, 1]
         """
+        images = images
         num_steps = len(images)
         results = self.initial_predict(images)
-        x2d = self.morec_model(num_steps)
+        x2d0 = results['joints']
+        q3d0 = results['theta'][:,self.num_cam:(self.num_cam + self.num_theta)]
+        z0 = results['hidden']
+        x2d, q3d = self.morec_model(z0, x2d0)
+        l_2d = tf.reduce_sum(tf.abs(x2d-x2d0))
+        l_3d = tf.reduce_sum(tf.abs(q3d-q3d0))
+        loss = l_2d + l_3d
+
+        optimizer = tf.train.GradientDescentOptimizer(0.01)
+        train = optimizer.minimize(loss)
+        self.sess.run(tf.global_variables_initializer())
+
+        for i in range(5):
+            _, x_val, loss_value = self.sess.run((train, x2d, loss))
+            print("step {}, loss = {}".format(i, loss_value))
 
         return results
 
@@ -204,6 +220,7 @@ class MotionReconstructionModel(object):
         results['cams'] = np.concatenate([v['cams'] for v in res])
         results['joints3d'] = np.concatenate([v['joints3d'] for v in res])
         results['theta'] = np.concatenate([v['theta'] for v in res])
+        results['hidden'] = np.concatenate([v['hidden'] for v in res])
 
         return results
 
@@ -224,6 +241,7 @@ class MotionReconstructionModel(object):
             'cams': self.all_cams[-1],
             'joints3d': self.all_Js[-1],
             'theta': self.final_thetas[-1],
+            'hidden': self.img_feat,
         }
 
         results = self.sess.run(fetch_dict, feed_dict)
