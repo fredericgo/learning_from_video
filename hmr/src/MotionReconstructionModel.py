@@ -71,6 +71,10 @@ class MotionReconstructionModel(object):
         self.saver = tf.train.Saver()
         self.prepare()
 
+        # motion reconstruction model setting
+        self.num_hidden = 2048
+        self.morec_model()
+
 
     def build_test_model_ief(self):
         # Load mean value
@@ -126,11 +130,45 @@ class MotionReconstructionModel(object):
             # Finally)update to end iteration.
             theta_prev = theta_here
 
+    def morec_model(self):
+        z = tf.get_variable("Z", shape=(None, self.num_hidden))
+        theta_prev = tf.tile(self.mean_var, [None, 1])
+        for i in np.arange(self.num_stage):
+            print('Iteration %d' % i)
+            # ---- Compute outputs
+            state = tf.concat([z, theta_prev], 1)
+
+            if i == 0:
+                delta_theta, _ = self.threed_enc_fn(
+                    state,
+                    num_output=self.total_params,
+                    is_training=False,
+                    reuse=False)
+            else:
+                delta_theta, _ = self.threed_enc_fn(
+                    state,
+                    num_output=self.total_params,
+                    is_training=False,
+                    reuse=True)
+
+            # Compute new theta
+            theta_here = theta_prev + delta_theta
+            # Finally)update to end iteration.
+            theta_prev = theta_here
+
+        # cam = N x 3, pose N x self.num_theta, shape: N x 10
+        cams = theta_here[:, :self.num_cam]
+        poses = theta_here[:, self.num_cam:(self.num_cam + self.num_theta)]
+        shapes = theta_here[:, (self.num_cam + self.num_theta):]
+        verts, Js, _ = self.smpl(shapes, poses, get_skin=True)
+        # Project to 2D!
+        pred_kp = self.proj_fn(Js, cams, name='proj_2d_stage%d' % i)
 
     def prepare(self):
         print('Restoring checkpoint %s..' % self.load_path)
         self.saver.restore(self.sess, self.load_path)
         self.mean_value = self.sess.run(self.mean_var)
+
 
     def predict(self, images):
         """
@@ -138,7 +176,7 @@ class MotionReconstructionModel(object):
         Preprocessed to range [-1, 1]
         """
         results = self.initial_predict(images)
-        
+
         return results
 
 

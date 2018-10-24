@@ -15,5 +15,5 @@ e = MoRecSkeletonExtractor(config)
 img_dir = "data/youtube/1/"
 z = e(img_dir)
 
-np.save('results/data.npy', X)
+np.save('results/data.npy', z)
 #np.save('j3d.npy', z)
