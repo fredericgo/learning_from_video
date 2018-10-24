@@ -185,9 +185,8 @@ class MotionReconstructionModel(object):
         x2d, q3d, J3d = self.morec_model(z0, x2d0)
         l_2d = tf.reduce_sum(tf.abs(x2d-x2d0))
         l_3d = tf.reduce_sum(tf.abs(q3d-q3d0))
-        l_sm = J3d[1:]-J3d[:-1]
-        print(l_sm)
-        loss = l_2d + l_3d
+        l_sm = tf.reduce_sum(tf.squared_difference(J3d[1:], J3d[:-1]))
+        loss = l_2d + l_3d + l_sm
 
         optimizer = tf.train.GradientDescentOptimizer(0.01)
         train = optimizer.minimize(loss)
