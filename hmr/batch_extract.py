@@ -13,7 +13,8 @@ config.load_path = src.config.PRETRAINED_MODEL
 e = MoRecSkeletonExtractor(config)
 
 img_dir = "data/youtube/1/"
-z = e(img_dir)
+z0, z_pred = e(img_dir)
 
-np.save('results/data.npy', z)
+np.save('results/data0.npy', z0)
+np.save('results/data_pred.npy', z_pred)
 #np.save('j3d.npy', z)

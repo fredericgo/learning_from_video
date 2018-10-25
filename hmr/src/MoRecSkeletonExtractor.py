@@ -72,10 +72,16 @@ class MoRecSkeletonExtractor:
 
     def __call__(self, img_path):
         input_img = self._preprocess(img_path)
-        return self._model.predict(input_img)
+        q3d0, q3d_pred = self._model.predict(input_img)
         #joints, verts, cams, joints3d, theta = self._model.predict(input_img, get_theta=True)
         # theta SMPL angles
-        #return self.kinematicTree(theta[0])
+        num_steps = input_img.shape[0]
+        x3d0 = np.zeros((num_steps, 32)) 
+        x3dp = np.zeros((num_steps, 32)) 
+        for i in range(num_steps):
+            x3d0[i] = self.kinematicTree(q3d0[i])
+            x3dp[i] = self.kinematicTree(q3d_pred[i])
+        return x3d0, x3dp
 
     def _preprocess(self, img_dir):
         onlyfiles = [f for f in os.listdir(img_dir)
@@ -128,7 +134,7 @@ class MoRecSkeletonExtractor:
         # 21: right elbow
         # 22-23: left shoulder (1,2)
         # 24: left elbow
-        theta = theta[self.num_cam:(self.num_cam + self.num_theta)]
+        #theta = theta[self.num_cam:(self.num_cam + self.num_theta)]
         theta = theta.reshape((-1,3))
         z = np.zeros(32)
         for joi, num in joints.items():

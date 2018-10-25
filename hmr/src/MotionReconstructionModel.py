@@ -186,17 +186,18 @@ class MotionReconstructionModel(object):
         l_2d = tf.reduce_sum(tf.abs(x2d-x2d0))
         l_3d = tf.reduce_sum(tf.abs(q3d-q3d0))
         l_sm = tf.reduce_sum(tf.squared_difference(J3d[1:], J3d[:-1]))
-        loss = l_2d + l_3d + l_sm
+        loss = 10*l_2d + 100*l_3d + 0*l_sm
 
-        optimizer = tf.train.GradientDescentOptimizer(0.01)
+        optimizer = tf.train.AdamOptimizer()
         train = optimizer.minimize(loss)
         self.sess.run(tf.global_variables_initializer())
 
-        for i in range(5):
+        for i in range(100):
             _, x_val, loss_value = self.sess.run((train, x2d, loss))
             print("step {}, loss = {}".format(i, loss_value))
 
-        return results
+        q3d_pred = self.sess.run(q3d)
+        return q3d0, q3d_pred
 
 
     def initial_predict(self, images):
