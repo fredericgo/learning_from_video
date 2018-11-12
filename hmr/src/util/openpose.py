@@ -52,3 +52,8 @@ def get_bbox_dict(kps, vis_thr=0.2):
     scale = 150. / person_height
 
     return scale, center
+
+def get_openpose_best_score(kps, vis_thr):
+    scores = [np.mean(kp[kp[:, 2] > vis_thr, 2]) for kp in kps]
+    kp = kps[np.argmax(scores)]
+    return kp[:, 2]

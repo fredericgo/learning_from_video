@@ -21,19 +21,21 @@ from transforms3d.axangles import axangle2mat
 from transforms3d import quaternions, euler
 
 joints = {
+    'Neck': 12,
     'Spine1': 3,
     'L_Shoulder': 16, 'L_Elbow': 18,
     'R_Shoulder': 17, 'R_Elbow': 19,
-    'L_Hip': 1,       'L_Knee': 4,
-    'R_Hip': 2,       'R_Knee': 5
+    'L_Hip': 1,       'L_Knee': 4, 'L_Ankle': 7,
+    'R_Hip': 2,       'R_Knee': 5, 'R_Ankle': 8
 }
 
 target_joints = {
-    'Spine1': [0,1,2],
-    'L_Shoulder': [6,7,8],    'L_Elbow': [11],
-    'R_Shoulder': [12,13,14], 'R_Elbow': [17],
-    'L_Hip': [18,19,20],      'L_Knee': [23],
-    'R_Hip': [25,26,27],      'R_Knee': [30]
+    'Neck':  [12, 13, 14, 15],
+    'Spine1': [8, 9, 10, 11],
+    'L_Shoulder': [39, 40, 41, 42], 'L_Elbow': [44],
+    'R_Shoulder': [25, 26, 27, 28], 'R_Elbow': [30],
+    'L_Hip': [30, 31, 32, 33],      'L_Knee': [23],       'L_Ankle': [35, 36, 37, 38],
+    'R_Hip': [16, 17, 18, 19],      'R_Knee': [20],       'R_Ankle': [21, 22, 23, 24],
 }
 
 def to_euler_xyz(x):
@@ -43,6 +45,13 @@ def to_euler_xyz(x):
     q = quaternions.axangle2quat(x, th)
     a = euler.quat2euler(q)
     return a
+
+def to_quaternion(x):
+    x[0], x[1], x[2] = x[2], x[0], x[1]
+    th = np.linalg.norm(x)
+    x_norm = x / th
+    q = quaternions.axangle2quat(x, th)
+    return q
 
 def to_angle(x):
     th = np.linalg.norm(x)
@@ -58,7 +67,7 @@ def preprocess_image(img_path, kps):
                                                224)
     # Normalize image to [-1, 1]
     crop = 2 * ((crop / 255.) - 0.5)
-
+    
     return crop, proc_param, img
 
 class MoRecSkeletonExtractor:
@@ -76,8 +85,8 @@ class MoRecSkeletonExtractor:
         #joints, verts, cams, joints3d, theta = self._model.predict(input_img, get_theta=True)
         # theta SMPL angles
         num_steps = input_img.shape[0]
-        x3d0 = np.zeros((num_steps, 32)) 
-        x3dp = np.zeros((num_steps, 32)) 
+        x3d0 = np.zeros((num_steps, 32))
+        x3dp = np.zeros((num_steps, 32))
         for i in range(num_steps):
             x3d0[i] = self.kinematicTree(q3d0[i])
             x3dp[i] = self.kinematicTree(q3d_pred[i])
@@ -123,20 +132,23 @@ class MoRecSkeletonExtractor:
         # 13 head
 
         ## GYM joints
-        # 1-3: torso x,y,z
-        # 4-7: torso rotation
-        # 8-10: abdomen (z,y,x)
-        # 11-13: right hip (x,z,y)
-        # 14: right knee
-        # 15-17: left hip (x,z,y)
-        # 18: left knee
-        # 19-20: right shoulder (1,2)
-        # 21: right elbow
-        # 22-23: left shoulder (1,2)
-        # 24: left elbow
+        # motions[:, 0] = 0.0625
+        # motions[:, 4:8] = [1, 0,0,0]    # root rotation
+        # motions[:, 8:12] = [1, 0,0,0]   # chest rotation
+        # motions[:, 12:16] = [1, 0, 0, 0]  # neck rotation
+        # motions[:, 16:20] = [1, 0, 0, 0] # right hip rot
+        # motions[:, 20] = [1, 0, 0, 0] # right knee
+        # motions[:, 21:25] = [1, 0, 0, 0] # right ankle rot
+        # motions[:, 25:29] = [1, 0, 0, 0] # right shoulder rotation
+        # motions[:, 30] = [1, 0, 0, 0] # right elbow
+        # motions[:, 30:34] = [1, 0, 0, 0] # left hip rot
+        # motions[:, 34] = [1, 0, 0, 0] # left knee
+        # motions[:, 35:39] = [1, 0, 0, 0] # left ankle
+        # motions[:, 39:43] = [1, 0, 0, 0] # left shoulder rot
+
         #theta = theta[self.num_cam:(self.num_cam + self.num_theta)]
         theta = theta.reshape((-1,3))
-        z = np.zeros(32)
+        z = np.zeros(44)
         for joi, num in joints.items():
             print("{}:".format(joi))
             x = theta[num]
@@ -145,7 +157,7 @@ class MoRecSkeletonExtractor:
             elif joi in ['R_Elbow', 'R_Knee', 'L_Knee']:
                 a = to_angle(x)
             else:
-                a = to_euler_xyz(x)
+                a = to_quaternion(x)
             print(a)
             z[target_joints[joi]] = a
         return z

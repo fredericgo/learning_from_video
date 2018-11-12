@@ -42,5 +42,5 @@ def video_to_frames(input_loc, output_loc):
             break
 
 if __name__ == "__main__":
-    name = "raw/SIDE BY SIDE COUNTRY LINE DANCE (Explication des pas et danse).mp4"
+    name = "raw/videoplayback.mp4"
     video_to_frames(name, "./frames")

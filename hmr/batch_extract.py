@@ -11,7 +11,6 @@ config.load_path = src.config.PRETRAINED_MODEL
 #config.batch_size = 1
 
 e = MoRecSkeletonExtractor(config)
-
 img_dir = "data/youtube/1/"
 z0, z_pred = e(img_dir)
 
