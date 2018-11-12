@@ -32,7 +32,7 @@ joints = {
 target_joints = {
     'Neck':  [12, 13, 14, 15],
     'Spine1': [8, 9, 10, 11],
-    'L_Shoulder': [39, 40, 41, 42], 'L_Elbow': [44],
+    'L_Shoulder': [39, 40, 41, 42], 'L_Elbow': [43],
     'R_Shoulder': [25, 26, 27, 28], 'R_Elbow': [30],
     'L_Hip': [30, 31, 32, 33],      'L_Knee': [23],       'L_Ankle': [35, 36, 37, 38],
     'R_Hip': [16, 17, 18, 19],      'R_Knee': [20],       'R_Ankle': [21, 22, 23, 24],
