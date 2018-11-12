@@ -85,8 +85,8 @@ class MoRecSkeletonExtractor:
         #joints, verts, cams, joints3d, theta = self._model.predict(input_img, get_theta=True)
         # theta SMPL angles
         num_steps = input_img.shape[0]
-        x3d0 = np.zeros((num_steps, 32))
-        x3dp = np.zeros((num_steps, 32))
+        x3d0 = np.zeros((num_steps, 44))
+        x3dp = np.zeros((num_steps, 44))
         for i in range(num_steps):
             x3d0[i] = self.kinematicTree(q3d0[i])
             x3dp[i] = self.kinematicTree(q3d_pred[i])
