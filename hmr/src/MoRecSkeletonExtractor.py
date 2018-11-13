@@ -83,9 +83,9 @@ class MoRecSkeletonExtractor:
         self.picture_size = 224
         self.num_channels = 3
 
-    def __call__(self, img_path):
+    def __call__(self, img_path, J3d=False):
         input_img = self._preprocess(img_path)
-        q3d0, q3d_pred = self._model.predict(input_img)
+        q3d0, q3d_pred, J3d = self._model.predict(input_img)
         #joints, verts, cams, joints3d, theta = self._model.predict(input_img, get_theta=True)
         # theta SMPL angles
         num_steps = input_img.shape[0]
@@ -94,7 +94,10 @@ class MoRecSkeletonExtractor:
         for i in range(num_steps):
             x3d0[i] = self.kinematicTree(q3d0[i])
             x3dp[i] = self.kinematicTree(q3d_pred[i])
-        return x3d0, x3dp
+        if J3d:
+            return x3d0, x3dp, J3d
+        else:
+            return x3d0, x3dp
 
     def _preprocess(self, img_dir):
         onlyfiles = [f for f in os.listdir(img_dir)

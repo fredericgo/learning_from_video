@@ -196,8 +196,8 @@ class MotionReconstructionModel(object):
             _, x_val, loss_value = self.sess.run((train, x2d, loss))
             print("step {}, loss = {}".format(i, loss_value))
 
-        q3d_pred = self.sess.run(q3d)
-        return q3d0, q3d_pred
+        q3d_pred, j3d_pred = self.sess.run([q3d, J3d])
+        return q3d0, q3d_pred, j3d_pred
 
 
     def initial_predict(self, images):
