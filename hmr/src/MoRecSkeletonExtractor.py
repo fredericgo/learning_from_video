@@ -39,7 +39,7 @@ target_joints = {
 }
 
 def to_euler_xyz(x):
-    x[0], x[1], x[2] = x[2], x[0], x[1]
+    x[0], x[1], x[2] = -x[2], x[1], x[0]
     th = np.linalg.norm(x)
     x_norm = x / th
     q = quaternions.axangle2quat(x, th)
@@ -47,7 +47,7 @@ def to_euler_xyz(x):
     return a
 
 def to_quaternion(x):
-    x[0], x[1], x[2] = x[2], x[0], x[1]
+    x[0], x[1], x[2] = -x[2], x[1], x[0]
     th = np.linalg.norm(x)
     x_norm = x / th
     q = quaternions.axangle2quat(x, th)
@@ -145,6 +145,8 @@ class MoRecSkeletonExtractor:
         # motions[:, 34] = [1, 0, 0, 0] # left knee
         # motions[:, 35:39] = [1, 0, 0, 0] # left ankle
         # motions[:, 39:43] = [1, 0, 0, 0] # left shoulder rot
+        # motions[:, 43] = [1, 0, 0, 0] # left elbow rot
+
 
         #theta = theta[self.num_cam:(self.num_cam + self.num_theta)]
         theta = theta.reshape((-1,3))
