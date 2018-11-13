@@ -6,7 +6,7 @@ from src.MoRecSkeletonExtractor import MoRecSkeletonExtractor
 import numpy as np
 import json
 import tempfile
-from plot_3d_to_img import J3dPlotter
+from src.util.plot_3d_to_img import J3dPlotter
 
 config = flags.FLAGS
 config(sys.argv)
