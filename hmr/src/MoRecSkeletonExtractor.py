@@ -94,7 +94,7 @@ class MoRecSkeletonExtractor:
         for i in range(num_steps):
             x3d0[i] = self.kinematicTree(q3d0[i])
             x3dp[i] = self.kinematicTree(q3d_pred[i])
-        if J3d:
+        if get_J3d:
             return x3d0, x3dp, J3d
         else:
             return x3d0, x3dp

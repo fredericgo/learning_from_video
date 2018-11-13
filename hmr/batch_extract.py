@@ -6,6 +6,7 @@ from src.MoRecSkeletonExtractor import MoRecSkeletonExtractor
 import numpy as np
 import json
 import tempfile
+import matplotlib as mpl
 import matplotlib.pyplot as plt
 from mpl_toolkits import mplot3d
 
@@ -14,7 +15,7 @@ config(sys.argv)
 config.load_path = src.config.PRETRAINED_MODEL
 #config.batch_size = 1
 
-def p3d(joints, filename)
+def p3d(joints, filename):
     plt.figure(1)
     plt.clf()
     ax = plt.axes(projection='3d')
@@ -41,13 +42,13 @@ def plot_joints(joints3d):
     tempdir = tempfile.mkdtemp()
     print(tempdir)
     for i, x in enumerate(joints3d):
-    	outfilename = os.path.join(tempdir, 'temp_{05d}.png'.format(i))
-    	plot_joints(x, outfilename)
+        outfilename = os.path.join(tempdir, 'temp_{:05d}.png'.format(i))
+    	p3d(x, outfilename)
 
 
 e = MoRecSkeletonExtractor(config)
 img_dir = "data/youtube/baseball_pitch/"
-z0, z_pred, j3d = e(img_dir, two_dim=True)
+z0, z_pred, j3d = e(img_dir, get_J3d=True)
 
 mfile = dict()
 mfile['Loop'] = 'wrap'
@@ -55,8 +56,8 @@ z_pred[:, 0] = 0.0625
 z_pred[:, 4:8] = [1, 0, 0, 0]
 mfile['Frames'] = z_pred.tolist()
  
-with open('results/humanoid3d_pitch.txt') as f:
+with open('results/humanoid3d_pitch.txt', 'w') as f:
 	json.dump(mfile, f, indent=2)
 
-print(j3d)
 
+plot_joints(j3d)
