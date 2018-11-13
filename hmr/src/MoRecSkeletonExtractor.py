@@ -155,7 +155,7 @@ class MoRecSkeletonExtractor:
             print("{}:".format(joi))
             x = theta[num]
             if joi in ['L_Elbow']:
-                a = -to_angle(x)
+                a = to_angle(x)
             elif joi in ['R_Elbow', 'R_Knee', 'L_Knee']:
                 a = to_angle(x)
             else:
