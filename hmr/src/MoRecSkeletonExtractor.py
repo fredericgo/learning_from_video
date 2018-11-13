@@ -59,7 +59,7 @@ def to_angle(x):
     th = np.linalg.norm(x)
     x_norm = x / th
     print("axis: {}, angle: {}".format(x_norm, np.rad2deg(th)))
-    return th
+    return np.pi - th
 
 def preprocess_image(img_path, kps):
     img = io.imread(img_path)
