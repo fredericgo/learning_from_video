@@ -55,7 +55,10 @@ def to_quaternion(x):
     return q
 
 def to_angle(x):
+    x[0], x[1], x[2] = -x[2], x[1], x[0]
     th = np.linalg.norm(x)
+    x_norm = x / th
+    print("axis: {}, angle: {}".format(x_norm, np.rad2deg(th)))
     return th
 
 def preprocess_image(img_path, kps):
