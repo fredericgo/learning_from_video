@@ -83,7 +83,7 @@ class MoRecSkeletonExtractor:
         self.picture_size = 224
         self.num_channels = 3
 
-    def __call__(self, img_path, J3d=False):
+    def __call__(self, img_path, get_J3d=False):
         input_img = self._preprocess(img_path)
         q3d0, q3d_pred, J3d = self._model.predict(input_img)
         #joints, verts, cams, joints3d, theta = self._model.predict(input_img, get_theta=True)
