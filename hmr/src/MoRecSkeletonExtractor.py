@@ -25,8 +25,8 @@ joints = {
     'Spine1': 3,
     'L_Shoulder': 16, 'L_Elbow': 18,
     'R_Shoulder': 17, 'R_Elbow': 19,
-    'L_Hip': 1,       'L_Knee': 4, 'L_Ankle': 7,
-    'R_Hip': 2,       'R_Knee': 5, 'R_Ankle': 8
+    'L_Hip': 2,       'L_Knee': 4, 'L_Ankle': 7,
+    'R_Hip': 1,       'R_Knee': 5, 'R_Ankle': 8
 }
 
 target_joints = {
@@ -42,7 +42,7 @@ def to_euler_xyz(x):
     x[0], x[1], x[2] = -x[2], x[1], x[0]
     th = np.linalg.norm(x)
     x_norm = x / th
-    q = quaternions.axangle2quat(x, th)
+    q = quaternions.axangle2quat(x_norm, th)
     a = euler.quat2euler(q)
     return a
 
@@ -50,7 +50,7 @@ def to_quaternion(x):
     x[0], x[1], x[2] = -x[2], x[1], x[0]
     th = np.linalg.norm(x)
     x_norm = x / th
-    q = quaternions.axangle2quat(x, th)
+    q = quaternions.axangle2quat(x_norm, th)
     return q
 
 def to_angle(x):
@@ -154,9 +154,7 @@ class MoRecSkeletonExtractor:
         for joi, num in joints.items():
             print("{}:".format(joi))
             x = theta[num]
-            if joi in ['L_Elbow']:
-                a = to_angle(x)
-            elif joi in ['R_Elbow', 'R_Knee', 'L_Knee']:
+            if joi in ['L_Elbow', 'R_Elbow', 'R_Knee', 'L_Knee']:
                 a = to_angle(x)
             else:
                 a = to_quaternion(x)
