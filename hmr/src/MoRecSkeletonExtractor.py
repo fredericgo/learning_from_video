@@ -21,6 +21,7 @@ from transforms3d.axangles import axangle2mat
 from transforms3d import quaternions, euler
 
 joints = {
+    'Pelvis': 0,
     'Neck': 12,
     'Spine1': 3,
     'L_Shoulder': 16, 'L_Elbow': 18,
@@ -31,6 +32,7 @@ joints = {
 
 # LR reverse for deepmimic
 target_joints = {
+    'Pelvis': [4, 5, 6, 7],
     'Neck':  [12, 13, 14, 15],
     'Spine1': [8, 9, 10, 11],
     'L_Shoulder': [39, 40, 41, 42], 'L_Elbow': [43],

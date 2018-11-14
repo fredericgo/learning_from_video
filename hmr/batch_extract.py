@@ -21,7 +21,6 @@ z0, z_pred, j3d = e(img_dir, get_J3d=True)
 mfile = dict()
 mfile['Loop'] = 'wrap'
 z_pred[:, 0] = 0.0625
-z_pred[:, 4:8] = [1, 0, 0, 0]
 mfile['Frames'] = z_pred.tolist()
  
 with open('results/humanoid3d_pitch.txt', 'w') as f:
