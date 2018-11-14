@@ -35,8 +35,8 @@ target_joints = {
     'Spine1': [8, 9, 10, 11],
     'L_Shoulder': [39, 40, 41, 42], 'L_Elbow': [43],
     'R_Shoulder': [25, 26, 27, 28], 'R_Elbow': [30],
-    'L_Hip': [16, 17, 18, 19],      'L_Knee': [20],       'L_Ankle': [21, 22, 23, 24],
-    'R_Hip': [30, 31, 32, 33],      'R_Knee': [34],       'R_Ankle': [35, 36, 37, 38],
+    'L_Hip':  [16, 17, 18, 19],      'L_Knee': [20],       'L_Ankle': [21, 22, 23, 24],
+    'R_Hip':  [30, 31, 32, 33],      'R_Knee': [34],       'R_Ankle': [35, 36, 37, 38],
 }
 
 def to_euler_xyz(x):
@@ -85,7 +85,7 @@ class MoRecSkeletonExtractor:
 
     def __call__(self, img_path, get_J3d=False):
         input_img = self._preprocess(img_path)
-        q3d0, q3d_pred, J3d, z = self._model.predict(input_img)
+        q3d0, q3d_pred, J3d = self._model.predict(input_img)
         #joints, verts, cams, joints3d, theta = self._model.predict(input_img, get_theta=True)
         # theta SMPL angles
         num_steps = input_img.shape[0]
@@ -95,7 +95,7 @@ class MoRecSkeletonExtractor:
             x3d0[i] = self.kinematicTree(q3d0[i])
             x3dp[i] = self.kinematicTree(q3d_pred[i])
         if get_J3d:
-            return x3d0, x3dp, J3d, z
+            return x3d0, x3dp, J3d
         else:
             return x3d0, x3dp
 

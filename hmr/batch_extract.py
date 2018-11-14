@@ -16,7 +16,7 @@ config.load_path = src.config.PRETRAINED_MODEL
 
 e = MoRecSkeletonExtractor(config)
 img_dir = "data/youtube/baseball_pitch/"
-z0, z_pred, j3d, z = e(img_dir, get_J3d=True)
+z0, z_pred, j3d = e(img_dir, get_J3d=True)
 
 mfile = dict()
 mfile['Loop'] = 'wrap'
@@ -26,8 +26,5 @@ mfile['Frames'] = z_pred.tolist()
  
 with open('results/humanoid3d_pitch.txt', 'w') as f:
 	json.dump(mfile, f, indent=2)
-
-print(z)
-print(j3d)
 
 J3dPlotter().plot(j3d)

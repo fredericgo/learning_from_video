@@ -162,10 +162,10 @@ class MotionReconstructionModel(object):
         cams = theta_here[:, :self.num_cam]
         poses = theta_here[:, self.num_cam:(self.num_cam + self.num_theta)]
         shapes = theta_here[:, (self.num_cam + self.num_theta):]
-        verts, Js, _, J3d = self.smpl(shapes, poses, get_skin=True)
+        verts, Js, _, _ = self.smpl(shapes, poses, get_skin=True)
         # Project to 2D!
         pred_kp = self.proj_fn(Js, cams, name='proj_2d_stage%d' % i)
-        return pred_kp, poses, J3d, z
+        return pred_kp, poses, Js
 
     def prepare(self):
         print('Restoring checkpoint %s..' % self.load_path)
@@ -183,11 +183,11 @@ class MotionReconstructionModel(object):
         x2d0 = results['joints']
         q3d0 = results['theta'][:,self.num_cam:(self.num_cam + self.num_theta)]
         z0 = results['hidden']
-        x2d, q3d, J3d, z = self.morec_model(z0, x2d0)
+        x2d, q3d, J3d = self.morec_model(z0, x2d0)
         l_2d = tf.reduce_sum(tf.abs(x2d-x2d0))
         l_3d = tf.reduce_sum(tf.abs(q3d-q3d0))
         l_sm = tf.reduce_sum(tf.squared_difference(J3d[1:], J3d[:-1]))
-        loss = 10 * l_2d + 100 * l_3d + 0.0 * l_sm
+        loss = 10 * l_2d + 50 * l_3d + 1 * l_sm
 
         optimizer = tf.train.AdamOptimizer()
         train_vars =  tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, "Z")
@@ -205,8 +205,8 @@ class MotionReconstructionModel(object):
             _, x_val, loss_value = self.sess.run((train, x2d, loss))
             print("step {}, loss = {}".format(i, loss_value))
 
-        q3d_pred, j3d_pred, z_pred = self.sess.run([q3d, J3d, z])
-        return q3d0, q3d_pred, j3d_pred, z_pred #results['joints3d']
+        q3d_pred, j3d_pred = self.sess.run([q3d, J3d])
+        return q3d0, q3d_pred, j3d_pred #results['joints3d']
 
 
     def initial_predict(self, images):
