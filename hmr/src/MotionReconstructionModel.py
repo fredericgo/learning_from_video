@@ -116,7 +116,7 @@ class MotionReconstructionModel(object):
             poses = theta_here[:, self.num_cam:(self.num_cam + self.num_theta)]
             shapes = theta_here[:, (self.num_cam + self.num_theta):]
 
-            verts, Js, _, _ = self.smpl(shapes, poses, get_skin=True)
+            verts, Js, _, Jtrans = self.smpl(shapes, poses, get_skin=True)
 
             # Project to 2D!
             pred_kp = self.proj_fn(Js, cams, name='proj_2d_stage%d' % i)
@@ -131,7 +131,9 @@ class MotionReconstructionModel(object):
 
     def morec_model(self, z0, x2d0):
         num_steps = z0.shape[0]
-        z = tf.get_variable("Z", initializer=tf.constant(z0))
+        z = tf.get_variable("Z",
+                  shape=(num_steps, 2048),
+                  initializer=tf.zeros_initializer())#, initializer=tf.constant(z0))
         theta_prev = tf.tile(self.mean_var, [num_steps, 1])
         for i in np.arange(self.num_stage):
             print('Iteration %d' % i)
@@ -163,13 +165,12 @@ class MotionReconstructionModel(object):
         verts, Js, _, J3d = self.smpl(shapes, poses, get_skin=True)
         # Project to 2D!
         pred_kp = self.proj_fn(Js, cams, name='proj_2d_stage%d' % i)
-        return pred_kp, poses, J3d
+        return pred_kp, poses, J3d, z
 
     def prepare(self):
         print('Restoring checkpoint %s..' % self.load_path)
         self.saver.restore(self.sess, self.load_path)
         self.mean_value = self.sess.run(self.mean_var)
-
 
     def predict(self, images):
         """
@@ -182,22 +183,30 @@ class MotionReconstructionModel(object):
         x2d0 = results['joints']
         q3d0 = results['theta'][:,self.num_cam:(self.num_cam + self.num_theta)]
         z0 = results['hidden']
-        x2d, q3d, J3d = self.morec_model(z0, x2d0)
+        x2d, q3d, J3d, z = self.morec_model(z0, x2d0)
         l_2d = tf.reduce_sum(tf.abs(x2d-x2d0))
         l_3d = tf.reduce_sum(tf.abs(q3d-q3d0))
         l_sm = tf.reduce_sum(tf.squared_difference(J3d[1:], J3d[:-1]))
-        loss = 10 * l_2d + 100 * l_3d + 0 * l_sm
+        loss = 10 * l_2d + 100 * l_3d + 0.0 * l_sm
 
         optimizer = tf.train.AdamOptimizer()
-        train = optimizer.minimize(loss)
-        self.sess.run(tf.global_variables_initializer())
+        train_vars =  tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, "Z")
+        train = optimizer.minimize(loss, var_list=train_vars)
+        uninit_names = set(self.sess.run(tf.report_uninitialized_variables()))
+        uninit_vars = [ v for v in tf.global_variables() 
+                       if v.name.split(":")[0] in uninit_names]
+        #train_writer = tf.summary.FileWriter( 'summary', self.sess.graph)
+        init_op = tf.variables_initializer(uninit_vars)
+        self.sess.run(init_op)
+
+        #self.sess.run(tf.global_variables_initializer())
 
         for i in range(100):
             _, x_val, loss_value = self.sess.run((train, x2d, loss))
             print("step {}, loss = {}".format(i, loss_value))
 
-        q3d_pred, j3d_pred = self.sess.run([q3d, J3d])
-        return q3d0, q3d_pred, j3d_pred
+        q3d_pred, j3d_pred, z_pred = self.sess.run([q3d, J3d, z])
+        return q3d0, q3d_pred, j3d_pred, z_pred #results['joints3d']
 
 
     def initial_predict(self, images):

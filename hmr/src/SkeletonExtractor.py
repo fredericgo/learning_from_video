@@ -126,7 +126,7 @@ class SkeletonExtractor:
         theta = theta.reshape((-1,3))
         z = np.zeros(32)
         for joi, num in joints.items():
-            print("{}:".format(joi))
+            #print("{}:".format(joi))
             x = theta[num]
             if joi in ['L_Elbow']:
                 a = -to_angle(x)
@@ -134,6 +134,6 @@ class SkeletonExtractor:
                 a = to_angle(x)
             else:
                 a = to_euler_xyz(x)
-            print(a)
+            #print(a)
             z[target_joints[joi]] = a
         return z

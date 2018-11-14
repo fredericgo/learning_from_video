@@ -133,8 +133,7 @@ class SMPL(object):
                 [-1, self.size[0], self.size[1]]) + v_shaped
 
             #4. Get the global joint location
-            self.J_transformed, A = batch_global_rigid_transformation(Rs, J, self.parents)
-
+            J_transformed, A = batch_global_rigid_transformation(Rs, J, self.parents)
             # 5. Do skinning:
             # W is N x 6890 x 24
             W = tf.reshape(
@@ -156,6 +155,6 @@ class SMPL(object):
             joints = tf.stack([joint_x, joint_y, joint_z], axis=2)
 
             if get_skin:
-                return verts, joints, Rs, self.J_transformed
+                return verts, joints, Rs, J_transformed
             else:
                 return joints

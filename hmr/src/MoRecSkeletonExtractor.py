@@ -58,7 +58,7 @@ def to_angle(x):
     x[0], x[1], x[2] = -x[2], x[1], x[0]
     th = np.linalg.norm(x)
     x_norm = x / th
-    print("axis: {}, angle: {}".format(x_norm, np.rad2deg(th)))
+    #print("axis: {}, angle: {}".format(x_norm, np.rad2deg(th)))
     return 2 * np.pi - th
 
 def preprocess_image(img_path, kps):
@@ -85,7 +85,7 @@ class MoRecSkeletonExtractor:
 
     def __call__(self, img_path, get_J3d=False):
         input_img = self._preprocess(img_path)
-        q3d0, q3d_pred, J3d = self._model.predict(input_img)
+        q3d0, q3d_pred, J3d, z = self._model.predict(input_img)
         #joints, verts, cams, joints3d, theta = self._model.predict(input_img, get_theta=True)
         # theta SMPL angles
         num_steps = input_img.shape[0]
@@ -95,7 +95,7 @@ class MoRecSkeletonExtractor:
             x3d0[i] = self.kinematicTree(q3d0[i])
             x3dp[i] = self.kinematicTree(q3d_pred[i])
         if get_J3d:
-            return x3d0, x3dp, J3d
+            return x3d0, x3dp, J3d, z
         else:
             return x3d0, x3dp
 
@@ -159,12 +159,12 @@ class MoRecSkeletonExtractor:
         theta = theta.reshape((-1,3))
         z = np.zeros(44)
         for joi, num in joints.items():
-            print("{}:".format(joi))
+            #print("{}:".format(joi))
             x = theta[num]
             if joi in ['L_Elbow', 'R_Elbow', 'R_Knee', 'L_Knee']:
                 a = to_angle(x)
             else:
                 a = to_quaternion(x)
-            print(a)
+            #print(a)
             z[target_joints[joi]] = a
         return z
