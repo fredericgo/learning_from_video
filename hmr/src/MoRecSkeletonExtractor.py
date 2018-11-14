@@ -23,7 +23,7 @@ from transforms3d import quaternions, euler
 joints = {
     'Pelvis': 0,
     'Neck': 12,
-    'Spine1': 3,
+    'Spine2': 6,
     'L_Shoulder': 16, 'L_Elbow': 18,
     'R_Shoulder': 17, 'R_Elbow': 19,
     'L_Hip': 1,       'L_Knee': 4, 'L_Ankle': 7,
@@ -34,9 +34,9 @@ joints = {
 target_joints = {
     'Pelvis': [4, 5, 6, 7],
     'Neck':  [12, 13, 14, 15],
-    'Spine1': [8, 9, 10, 11],
+    'Spine2': [8, 9, 10, 11],
     'L_Shoulder': [39, 40, 41, 42], 'L_Elbow': [43],
-    'R_Shoulder': [25, 26, 27, 28], 'R_Elbow': [30],
+    'R_Shoulder': [25, 26, 27, 28], 'R_Elbow': [29],
     'L_Hip':  [16, 17, 18, 19],      'L_Knee': [20],       'L_Ankle': [21, 22, 23, 24],
     'R_Hip':  [30, 31, 32, 33],      'R_Knee': [34],       'R_Ankle': [35, 36, 37, 38],
 }
@@ -163,8 +163,16 @@ class MoRecSkeletonExtractor:
         for joi, num in joints.items():
             #print("{}:".format(joi))
             x = theta[num]
-            if joi in ['L_Elbow', 'R_Elbow', 'R_Knee', 'L_Knee']:
+            if joi in ['R_Knee', 'L_Knee']:
                 a = to_angle(x)
+            elif joi in ['L_Elbow', 'R_Elbow']:
+                a = -to_angle(x)
+            elif joi in ['Pelvis']:
+                a = to_quaternion(x)
+                a = quaternions.qmult([0, 1, 0, 0], a)
+            elif joi in ['L_Shoulder', 'R_Shoulder']:
+                a = to_quaternion(x)
+                #a = quaternions.qmult([0.7071, 0, 0, -0.7071], a)
             else:
                 a = to_quaternion(x)
             #print(a)
