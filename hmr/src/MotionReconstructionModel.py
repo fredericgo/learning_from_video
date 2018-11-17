@@ -187,7 +187,7 @@ class MotionReconstructionModel(object):
         l_2d = tf.reduce_sum(tf.abs(x2d-x2d0))
         l_3d = tf.reduce_sum(tf.abs(q3d-q3d0))
         l_sm = tf.reduce_sum(tf.squared_difference(J3d[1:], J3d[:-1]))
-        loss = 10 * l_2d + 50 * l_3d + 1 * l_sm
+        loss = 10 * l_2d + 100 * l_3d + 25 * l_sm
 
         optimizer = tf.train.AdamOptimizer()
         train_vars =  tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, "Z")
