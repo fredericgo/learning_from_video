@@ -17,7 +17,7 @@ class J3dPlotter(object):
             outfilename = os.path.join(tempdir, 'temp_{:05d}.png'.format(i))
             self._p3d(x, outfilename)
 
-        os.system("ffmpeg -y -i {}/temp_%5d.png -pix_fmt yuv420p -r 5 output.mp4".format(tempdir))
+        os.system("ffmpeg -y -i {}/temp_%5d.png -pix_fmt yuv420p -r 5 output/output.mp4".format(tempdir))
         shutil.rmtree(tempdir)
         
 
