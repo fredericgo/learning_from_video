@@ -1,11 +1,8 @@
-import argparse
 import logging
 import sys
 import time
 import os
 
-from absl import flags
-import cv2
 import numpy as np
 import skimage.io as io
 from src.util import image as img_util
@@ -20,12 +17,21 @@ import matplotlib.pyplot as plt
 from transforms3d.axangles import axangle2mat
 from transforms3d import quaternions, euler
 
+smpl_joint_names = {
+    0:  'Pelvis',
+    1:  'L_Hip',        4:  'L_Knee',            7:  'L_Ankle',           10: 'L_Foot',
+    2:  'R_Hip',        5:  'R_Knee',            8:  'R_Ankle',           11: 'R_Foot',
+    3:  'Spine1',       6:  'Spine2',            9:  'Spine3',            12: 'Neck',            15: 'Head',
+    13: 'L_Collar',     16: 'L_Shoulder',       18: 'L_Elbow',            20: 'L_Wrist',         22: 'L_Hand',
+    14: 'R_Collar',     17: 'R_Shoulder',       19: 'R_Elbow',            21: 'R_Wrist',         23: 'R_Hand',
+}
+
 joints = {
     'Pelvis': 0,
     'Neck': 12,
     'Chest': 3,
-    'L_Shoulder': 17, 'L_Elbow': 19,
-    'R_Shoulder': 16, 'R_Elbow': 18,
+    'L_Shoulder': 16, 'L_Elbow': 18,
+    'R_Shoulder': 17, 'R_Elbow': 19,
     'L_Hip': 1,       'L_Knee': 4, 'L_Ankle': 7,
     'R_Hip': 2,       'R_Knee': 5, 'R_Ankle': 8
 }
@@ -41,40 +47,16 @@ target_joints = {
     'R_Hip': [16, 17, 18, 19],      'R_Knee': [20],       'R_Ankle': [21, 22, 23, 24],
 }
 
-def to_euler_xyz(x):
-    x[0], x[1], x[2] = -x[2], x[1], x[0]
-    th = np.linalg.norm(x)
-    x_norm = x / th
-    q = quaternions.axangle2quat(x_norm, th)
-    a = euler.quat2euler(q)
-    return a
-
-def to_quaternion(x):
-    x[0], x[1], x[2] = -x[2], x[1], -x[0]
+def vec_to_quaternion(x):
     th = np.linalg.norm(x)
     x_norm = x / th
     q = quaternions.axangle2quat(x_norm, th)
     return q
 
-def to_angle(x):
-    #x[0], x[1], x[2] = -x[2], x[1], -x[0]
+def vec_to_angle(x):
     th = np.linalg.norm(x)
     x_norm = x / th
-    #print("axis: {}, angle: {}".format(x_norm, np.rad2deg(th)))
     return 2 * np.pi - th
-
-def preprocess_image(img_path, kps):
-    img = io.imread(img_path)
-    if img.shape[2] == 4:
-        img = img[:, :, :3]
-
-    scale, center = op_util.get_bbox_dict(kps)
-    crop, proc_param = img_util.scale_and_crop(img, scale, center,
-                                               224)
-    # Normalize image to [-1, 1]
-    crop = 2 * ((crop / 255.) - 0.5)
-    
-    return crop, proc_param, img
 
 class MoRecSkeletonExtractor:
     def __init__(self, config):
@@ -86,11 +68,11 @@ class MoRecSkeletonExtractor:
         self.num_channels = 3
 
     def __call__(self, img_path, get_J3d=False):
-        input_img = self._preprocess(img_path)
-        q3d0, q3d_pred, J3d = self._model.predict(input_img)
+        input_img_seq = self._preprocess(img_path)
+        q3d0, q3d_pred, J3d = self._model.predict(input_img_seq)
         #joints, verts, cams, joints3d, theta = self._model.predict(input_img, get_theta=True)
         # theta SMPL angles
-        num_steps = input_img.shape[0]
+        num_steps = input_img_seq.shape[0]
         x3d0 = np.zeros((num_steps, 44))
         x3dp = np.zeros((num_steps, 44))
         for i in range(num_steps):
@@ -101,27 +83,40 @@ class MoRecSkeletonExtractor:
         else:
             return x3d0, x3dp
 
+    def locate_person_and_crop(self, img_path):
+        kps = get_people(img_path)
+        img = io.imread(img_path)
+        if img.shape[2] == 4:
+            img = img[:, :, :3]
+
+        scale, center = op_util.get_bbox_dict(kps)
+        crop, proc_param = img_util.scale_and_crop(img, scale, center,
+                                                   224)
+        # Normalize image to [-1, 1]
+        crop = 2 * ((crop / 255.) - 0.5)
+        # Add batch dimension: 1 x D x D x 3
+        crop = np.expand_dims(crop, 0)
+
+        return crop, proc_param, img
+
     def _preprocess(self, img_dir):
-        onlyfiles = [f for f in os.listdir(img_dir)
+        files = [f for f in os.listdir(img_dir)
                      if os.path.isfile(os.path.join(img_dir, f))]
-        onlyfiles = sorted(onlyfiles,
+        files = sorted(onlyfiles,
                            key=lambda f: int(f.rsplit('.')[0].split('_')[-1]))
 
-        N = len(onlyfiles)
+        N = len(files)
         X = np.zeros((N, self.picture_size, self.picture_size, 3))
-        for i, file in enumerate(onlyfiles):
-            print("File: {}".format(file))
-            img_path = os.path.join(img_dir, file)
-            kps = get_people(img_path)
+        for i, f in enumerate(files):
+            print("File: {}".format(f))
+            img_path = os.path.join(img_dir, f)
+
             try:
-                input_img, proc_param, img = preprocess_image(img_path, kps)
-                # Add batch dimension: 1 x D x D x 3
-                input_img = np.expand_dims(input_img, 0)
+                input_img, proc_param, img = self.locate_person_and_crop(img_path)
                 X[i] = input_img
             except:
                 print('no human detected at frame {}.'.format(i))
         return X
-
 
     def kinematicTree(self, theta):
         """
@@ -159,41 +154,30 @@ class MoRecSkeletonExtractor:
         # motions[:, 39:43] = [1, 0, 0, 0] # left shoulder rot
         # motions[:, 43] = [1, 0, 0, 0] # left elbow rot
 
-
         #theta = theta[self.num_cam:(self.num_cam + self.num_theta)]
         theta = theta.reshape((-1,3))
         z = np.zeros(44)
         for joi, num in joints.items():
-            #print("{}:".format(joi))
             x = theta[num]
             if joi in ['R_Knee', 'L_Knee']:
-                q = to_angle(x)
+                q = vec_to_angle(x)
             elif joi in ['L_Elbow', 'R_Elbow']:
-                q = -to_angle(x)
+                q = -vec_to_angle(x)
             elif joi in ['Pelvis']:
-                q = to_quaternion(x)
-                #q = quaternions.qmult([0.7071, 0, 0.7071, 0], q)
+                q = vec_to_quaternion(x)
+                q = quaternions.qmult([0.7071, 0, -0.7071, 0], q)
                 q = quaternions.qmult([0, 1, 0, 0], q)
             elif joi in ['L_Shoulder']:
-                x[0], x[1], x[2] = -x[2], x[1], -x[0]
-                th = np.linalg.norm(x)
-                x_norm = x / th
-                q = quaternions.axangle2quat(x_norm, th)
-                q = quaternions.qmult(q, [0.7071, 0.7071, 0, 0])
-                #q = quaternions.qmult([0.7071, 0, 0.7071, 0], q)
+                q = vec_to_quaternion(x)
+                q = quaternions.qmult(q, [0.7071, 0, 0, 0.7071])
+                q = quaternions.qmult([0.7071, 0, -0.7071, 0], q)
             elif joi in ['R_Shoulder']:
-                x[0], x[1], x[2] = -x[2], x[1], -x[0]
-                th = np.linalg.norm(x)
-                x_norm = x / th
-                q = quaternions.axangle2quat(x_norm, th)
-                q = quaternions.qmult(q, [0.7071, -0.7071, 0, 0])
-                #q = quaternions.qmult([0.7071, 0, 0.7071, 0], q)
-            elif joi in ['Chest']:
-                q = to_quaternion(x)
-                #q = quaternions.qmult([0.7071, 0, 0.7071, 0],q)
+                q = vec_to_quaternion(x)
+                q = quaternions.qmult(q, [0.7071, 0, 0, -0.7071])
+                q = quaternions.qmult([0.7071, 0, -0.7071, 0], q)
             else:
-                q = to_quaternion(x)
+                q = vec_to_quaternion(x)
+                q = quaternions.qmult([0.7071, 0, -0.7071, 0], q)
 
-            #print(a)
             z[target_joints[joi]] = q
         return z
