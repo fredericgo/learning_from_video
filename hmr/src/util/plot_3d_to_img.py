@@ -28,9 +28,9 @@ class J3dPlotter(object):
 
         fig = Figure()
         ax = fig.add_subplot(111, projection='3d')
-        #ax.set_xlim(0,2)
-        #ax.set_ylim(0,2)
-        #ax.set_zlim(0,10)
+        ax.set_xlim(-1,1)
+        ax.set_ylim(-1,1)
+        ax.set_zlim(0,5)
         ax.view_init(elev=90,azim=90)
         ax.scatter3D(joints[:,0],
                      joints[:,1],

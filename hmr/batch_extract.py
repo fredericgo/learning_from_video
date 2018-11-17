@@ -20,10 +20,10 @@ z0, z_pred, j3d = e(img_dir, get_J3d=True)
 
 mfile = dict()
 mfile['Loop'] = 'wrap'
-z_pred[:, 0] = 0.0625
+z_pred[:, 0] = 0.0333
 mfile['Frames'] = z_pred.tolist()
  
-with open('results/humanoid3d_pitch.txt', 'w') as f:
+with open('/home/fredericgo/DeepMimic/data/motions/humanoid3d_pitch.txt', 'w') as f:
 	json.dump(mfile, f, indent=2)
 
 J3dPlotter().plot(j3d)
