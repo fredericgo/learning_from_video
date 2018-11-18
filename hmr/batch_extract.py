@@ -15,7 +15,7 @@ config.load_path = src.config.PRETRAINED_MODEL
 
 
 e = MoRecSkeletonExtractor(config)
-img_dir = "data/youtube/baseball_pitch/"
+img_dir = "data/youtube/skating/"
 z0, z_pred, j3d = e(img_dir, get_J3d=True)
 
 mfile = dict()
@@ -23,7 +23,7 @@ mfile['Loop'] = 'wrap'
 z_pred[:, 0] = 0.0333
 mfile['Frames'] = z_pred.tolist()
  
-with open('/home/fredericgo/DeepMimic/data/motions/humanoid3d_pitch.txt', 'w') as f:
+with open('/home/fredericgo/DeepMimic/data/motions/humanoid3d_skating.txt', 'w') as f:
 	json.dump(mfile, f, indent=2)
 
 J3dPlotter().plot(j3d)
