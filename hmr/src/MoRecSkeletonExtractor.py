@@ -68,16 +68,17 @@ class MoRecSkeletonExtractor:
         self.num_channels = 3
 
     def __call__(self, img_path, get_J3d=False):
-        input_img_seq = self._preprocess(img_path)
-        q3d0, q3d_pred, J3d, cam = self._model.predict(input_img_seq)
+        input_img_seq, process_params = self._preprocess(img_path)
+        q3d0, q3d_pred, J3d, cams = self._model.predict(input_img_seq)
         #joints, verts, cams, joints3d, theta = self._model.predict(input_img, get_theta=True)
         # theta SMPL angles
         num_steps = input_img_seq.shape[0]
         x3d0 = np.zeros((num_steps, 44))
         x3dp = np.zeros((num_steps, 44))
+
         for i in range(num_steps):
-            x3d0[i] = self.kinematicTree(cam, q3d0[i])
-            x3dp[i] = self.kinematicTree(cam, q3d_pred[i])
+            x3d0[i] = self.kinematicTree(cams[i], process_params[i], q3d0[i])
+            x3dp[i] = self.kinematicTree(cams[i], process_params[i], q3d_pred[i])
         if get_J3d:
             return x3d0, x3dp, J3d
         else:
@@ -91,10 +92,12 @@ class MoRecSkeletonExtractor:
         cam_pos = cam[1:]
         flength = 500.
         tz = flength / (0.5 * img_size * cam_s)
-
-        pp_orig = cam_for_render[1:] / (img_size*undo_scale)
-        print(pp_orig)
+        principal_pt = np.array([img_size, img_size]) / 2.
+        start_pt = proc_param['start_pt'] - 0.5 * img_size
+        final_principal_pt = (principal_pt + start_pt) * undo_scale
+        pp_orig = final_principal_pt / (img_size*undo_scale)
         trans = np.hstack([pp_orig, tz])
+        return trans
 
     def locate_person_and_crop(self, img_path):
         kps = get_people(img_path)
@@ -120,18 +123,21 @@ class MoRecSkeletonExtractor:
 
         N = len(files)
         X = np.zeros((N, self.picture_size, self.picture_size, 3))
+        process_params = [dict() for i in range(N)]
+
         for i, f in enumerate(files):
             print("File: {}".format(f))
             img_path = os.path.join(img_dir, f)
 
             try:
-                input_img, proc_param, img = self.locate_person_and_crop(img_path)
+                input_img, param, img = self.locate_person_and_crop(img_path)
                 X[i] = input_img
+                process_params[i] = param
             except:
                 print('no human detected at frame {}.'.format(i))
         return X
 
-    def kinematicTree(self, theta):
+    def kinematicTree(self, cam, proc_param, theta):
         """
         z: 3D joint coordinates 14x3
         v: vectors
@@ -170,6 +176,8 @@ class MoRecSkeletonExtractor:
         #theta = theta[self.num_cam:(self.num_cam + self.num_theta)]
         theta = theta.reshape((-1,3))
         z = np.zeros(44)
+
+        z[1:4] = calcRootTranslation(cam, proc_param)
         for joi, num in joints.items():
             x = theta[num]
             # change of coordinates from SMPL to DeepMimic
