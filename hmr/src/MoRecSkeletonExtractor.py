@@ -69,19 +69,32 @@ class MoRecSkeletonExtractor:
 
     def __call__(self, img_path, get_J3d=False):
         input_img_seq = self._preprocess(img_path)
-        q3d0, q3d_pred, J3d = self._model.predict(input_img_seq)
+        q3d0, q3d_pred, J3d, cam = self._model.predict(input_img_seq)
         #joints, verts, cams, joints3d, theta = self._model.predict(input_img, get_theta=True)
         # theta SMPL angles
         num_steps = input_img_seq.shape[0]
         x3d0 = np.zeros((num_steps, 44))
         x3dp = np.zeros((num_steps, 44))
         for i in range(num_steps):
-            x3d0[i] = self.kinematicTree(q3d0[i])
-            x3dp[i] = self.kinematicTree(q3d_pred[i])
+            x3d0[i] = self.kinematicTree(cam, q3d0[i])
+            x3dp[i] = self.kinematicTree(cam, q3d_pred[i])
         if get_J3d:
             return x3d0, x3dp, J3d
         else:
             return x3d0, x3dp
+
+    def calcRootTranslation(self, cam, proc_param):
+        img_size = proc_param['img_size']
+        undo_scale = 1. / np.array(proc_param['scale'])
+
+        cam_s = cam[0]
+        cam_pos = cam[1:]
+        flength = 500.
+        tz = flength / (0.5 * img_size * cam_s)
+
+        pp_orig = cam_for_render[1:] / (img_size*undo_scale)
+        print(pp_orig)
+        trans = np.hstack([pp_orig, tz])
 
     def locate_person_and_crop(self, img_path):
         kps = get_people(img_path)
@@ -159,6 +172,7 @@ class MoRecSkeletonExtractor:
         z = np.zeros(44)
         for joi, num in joints.items():
             x = theta[num]
+            # change of coordinates from SMPL to DeepMimic
             if joi in ['R_Knee', 'L_Knee']:
                 q = vec_to_angle(x)
             elif joi in ['L_Elbow', 'R_Elbow']:
