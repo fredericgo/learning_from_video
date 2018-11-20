@@ -24,14 +24,14 @@ def crop_around_person(img):
 
 
 class VideoMotionProcessor(object):
-	def __init__(self):
-		pass
+    def __init__(self):
+        pass
 
-	def __call__(self, img_dir):
-		input_img_seq, process_params, img = self._preprocess(img_dir)
-		self._predict(input_img_seq)
+    def __call__(self, img_dir):
+        input_img_seq, process_params, img = self._preprocess(img_dir)
+        self._predict(input_img_seq)
 
-	def _preprocess(self, img_dir):
+    def _preprocess(self, img_dir):
         files = [f for f in os.listdir(img_dir)
                      if os.path.isfile(os.path.join(img_dir, f))]
         files = sorted(onlyfiles,
@@ -62,13 +62,13 @@ class VideoMotionProcessor(object):
         return X, process_params, imgs
 
 
-	def _predict(self):
-		pass
+    def _predict(self):
+        pass
 
 
-	def _visualize(self):
-		return
+    def _visualize(self):
+        return
 
-	def _save_motion(self):
-		return
+    def _save_motion(self):
+        return
 
