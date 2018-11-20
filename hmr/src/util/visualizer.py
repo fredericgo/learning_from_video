@@ -13,18 +13,15 @@ class Visualizer(object):
         self.SMPL_FACE_PATH = osp.join(curr_path, '../tf_smpl', 'smpl_faces.npy')
         self.renderer = vis_util.SMPLRenderer(face_path=self.SMPL_FACE_PATH)
 
-
-    def plot(self, joints3d):
+    def plot_3d(self, joints3d):
         joints3d = joints3d[:, :14, :]
         tempdir = tempfile.mkdtemp()
-        print(tempdir)
         for i, x in enumerate(joints3d):
             outfilename = os.path.join(tempdir, 'temp_{:05d}.png'.format(i))
             self._p3d(x, outfilename)
 
         os.system("ffmpeg -y -i {}/temp_%5d.png -pix_fmt yuv420p -r 5 output/output.mp4".format(tempdir))
-        #shutil.rmtree(tempdir)
-
+        shutil.rmtree(tempdir)
 
     def _p2d(self):
         #visualize(img, proc_param, joints[0], verts[0], cams[0])

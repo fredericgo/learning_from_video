@@ -8,7 +8,7 @@ from src.util import openpose as op_util
 from src.util import image as img_util
 from smpl_to_deepmimic import (smpl_to_deepmimic)
 from .MotionReconstructionModel import MotionReconstructionModel
-
+from src.util.visualizer import Visualizer
 
 def crop_around_person(img):
     kps = get_people(img)
@@ -31,13 +31,14 @@ class VideoMotionProcessor(object):
     def __init__(self, config):
         self.picture_size = 224
         self._model = MotionReconstructionModel(config)
+        self._visualizer = Visualizer()
 
     def __call__(self, img_dir):
         input_img_seq, process_params, img = self._preprocess(img_dir)
         q3d0, q3d, J3d, cams = self._predict(input_img_seq)
         x3d = self._convert_smpl_to_deepmimic(q3d, cams, process_params)
         self._save_motion(x3d, "motion.txt")
-        self._save_visualization(img, )
+        self._save_visualization(img, J3d)
 
     def _preprocess(self, img_dir):
         files = [f for f in os.listdir(img_dir)
@@ -74,8 +75,8 @@ class VideoMotionProcessor(object):
     def _convert_smpl_to_deepmimic(self, q3d, cams, process_params):
         smpl_to_deepmimic(q3d, cams, process_params)
 
-    def _save_visualization(self):
-        return
+    def _save_visualization(self, img, J3d):
+        self._visualizer.plot3d(J3d)
 
     def _save_motion(self, data, filename):
         mfile = dict()
