@@ -23,9 +23,14 @@ args = parser.parse_args()
 
 _estimator = TfPoseEstimator(get_graph_path(args.model), target_size=(432, 368))
 
-def get_people(img_path):
 
-    image = common.read_imgfile(img_path, None, None)
+def read_imgfile(path, width=None, height=None):
+    val_image = cv2.imread(path, cv2.IMREAD_COLOR)
+    if width is not None and height is not None:
+        val_image = cv2.resize(val_image, (width, height))
+    return val_image
+
+def get_people(image):
     wo, ho = image.shape[0], image.shape[1]
 
     if image is None:

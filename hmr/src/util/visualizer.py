@@ -4,10 +4,15 @@ from mpl_toolkits import mplot3d
 import tempfile
 import os
 import shutil
+from . import renderer as vis_util
 
-class J3dPlotter(object):
+
+class Visualizer(object):
     def __init__(self):
-        pass
+        curr_path = osp.dirname(osp.abspath(__file__))
+        self.SMPL_FACE_PATH = osp.join(curr_path, '../tf_smpl', 'smpl_faces.npy')
+        self.renderer = vis_util.SMPLRenderer(face_path=self.SMPL_FACE_PATH)
+
 
     def plot(self, joints3d):
         joints3d = joints3d[:, :14, :]
@@ -18,7 +23,19 @@ class J3dPlotter(object):
             self._p3d(x, outfilename)
 
         os.system("ffmpeg -y -i {}/temp_%5d.png -pix_fmt yuv420p -r 5 output/output.mp4".format(tempdir))
-        shutil.rmtree(tempdir)
+        #shutil.rmtree(tempdir)
+
+
+    def _p2d(self):
+        #visualize(img, proc_param, joints[0], verts[0], cams[0])
+        cam_for_render, vert_shifted, joints_orig = vis_util.get_original(
+            proc_param, verts, cam, joints, img_size=img.shape[:2])
+
+        # Render results
+        skel_img = vis_util.draw_skeleton(img, joints_orig)
+        rend_img_overlay = renderer(
+            vert_shifted, cam=cam_for_render, img=img, do_alpha=True)
+
         
 
     def _p3d(self, joints, filename):
