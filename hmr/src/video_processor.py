@@ -25,12 +25,14 @@ def crop_around_person(img):
 
 
 class VideoMotionProcessor(object):
-    def __init__(self):
+    def __init__(self, config):
         self.picture_size = 224
+        self._model = MotionReconstructionModel(config)
 
     def __call__(self, img_dir):
         input_img_seq, process_params, img = self._preprocess(img_dir)
-        self._predict(input_img_seq)
+        q3d0, q3d, J3d, cams = self._predict(input_img_seq)
+        x3d = self._convert_smpl_to_deepmimic(q3d, cams, process_params):
 
     def _preprocess(self, img_dir):
         files = [f for f in os.listdir(img_dir)
@@ -61,8 +63,10 @@ class VideoMotionProcessor(object):
         return X, process_params, imgs
 
 
-    def _predict(self):
-        pass
+    def _predict(self, img_seq):
+        return self._model.predict(img_seq)
+
+    def _convert_smpl_to_deepmimic(self, smpl_joints):
 
 
     def _visualize(self):

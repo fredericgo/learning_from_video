@@ -13,7 +13,7 @@ if __name__ == "__main__":
     config(sys.argv)
     config.load_path = src.config.PRETRAINED_MODEL
 
-    video_motion_process = VideoMotionProcessor()
+    video_motion_process = VideoMotionProcessor(config)
     img_dir = "data/youtube/skating/"
     video_motion_process(img_dir)
 
