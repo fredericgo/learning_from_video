@@ -31,6 +31,7 @@ def read_imgfile(path, width=None, height=None):
     return val_image
 
 def get_people(image):
+    image[:, :, 0], image[:, :, 1], image[:, :, 2] = image[:, :, 2], image[:, :, 1], image[:, :, 0]
     wo, ho = image.shape[0], image.shape[1]
 
     if image is None:

@@ -1,3 +1,4 @@
+import os
 import numpy as np
 import skimage.io as io
 
@@ -20,12 +21,12 @@ def crop_around_person(img):
     # Add batch dimension: 1 x D x D x 3
     crop = np.expand_dims(crop, 0)
 
-    return crop, proc_param, img
+    return crop, proc_param
 
 
 class VideoMotionProcessor(object):
     def __init__(self):
-        pass
+        self.picture_size = 224
 
     def __call__(self, img_dir):
         input_img_seq, process_params, img = self._preprocess(img_dir)
@@ -34,28 +35,26 @@ class VideoMotionProcessor(object):
     def _preprocess(self, img_dir):
         files = [f for f in os.listdir(img_dir)
                      if os.path.isfile(os.path.join(img_dir, f))]
-        files = sorted(onlyfiles,
+        files = sorted(files,
                            key=lambda f: int(f.rsplit('.')[0].split('_')[-1]))
-        img_paths = [img_path = os.path.join(img_dir, f) for f in files]
-        imgs = [io.imread(img_path) for p in img_paths]
+        img_paths = [os.path.join(img_dir, f) for f in files]
+        imgs = [io.imread(p) for p in img_paths]
 
         self.num_imgs = len(files)
-        self.original_size = imgs[0][:2]
+        self.original_size = imgs[0].shape[:2]
 
         X = np.zeros((self.num_imgs, self.picture_size, self.picture_size, 3))
-        imgs = np.zeros((self.num_imgs, self.original_size[0], self.original_size[1], 3))
-
-        process_params = [dict() for i in range(N)]
+        process_params = [dict() for i in range(self.num_imgs)]
 
         i_succ = 0
         for i, img in enumerate(imgs):
             print("File: {}".format(i))
             try:
-                input_img, param = crop_around_person(img_path)
+                input_img, param = crop_around_person(img)
                 X[i] = input_img
                 process_params[i] = param
-            except:
-                print('no human detected at frame {}.'.format(i))
+            except ValueError:
+                print('no human detected at frame {}, using the last successful frame.'.format(i))
                 X[i] = X[i_succ]
                 process_params[i] = process_params[i_succ]
             i_succ = i
