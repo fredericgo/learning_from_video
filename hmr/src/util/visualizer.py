@@ -9,23 +9,22 @@ import matplotlib.pyplot as plt
 
 class Visualizer(object):
     def __init__(self):
-        curr_path = osp.dirname(osp.abspath(__file__))
-        self.SMPL_FACE_PATH = osp.join(curr_path, '../tf_smpl', 'smpl_faces.npy')
+        curr_path = os.path.dirname(os.path.abspath(__file__))
+        self.SMPL_FACE_PATH = os.path.join(curr_path, '../tf_smpl', 'smpl_faces.npy')
         self.renderer = vis_util.SMPLRenderer(face_path=self.SMPL_FACE_PATH)
 
-
-    def plot_3d(self, joints3d):
+    def plot_3d(self, joints3d, vis_path):
         joints3d = joints3d[:, :14, :]
         tempdir = tempfile.mkdtemp()
         for i, x in enumerate(joints3d):
             outfilename = os.path.join(tempdir, 'temp_{:05d}.png'.format(i))
             self._p3d(x, outfilename)
 
-        os.system("ffmpeg -y -i {}/temp_%5d.png -pix_fmt yuv420p -r 5 output/visualize_3d_joints.mp4".format(tempdir))
+        os.system("ffmpeg -y -i {}/temp_%5d.png -pix_fmt yuv420p -r 5 {}/visualize_3d_joints.mp4".format(tempdir, vis_path))
         shutil.rmtree(tempdir)
 
 
-    def plot_2d(self, imgs, proc_params, joints, verts, cams):
+    def plot_2d(self, imgs, proc_params, joints, verts, cams, vis_path):
         num_imgs = imgs.shape[0]
         tempdir = tempfile.mkdtemp()
         for i in enumerate(num_imgs):
@@ -33,7 +32,7 @@ class Visualizer(object):
             self._p2d(imgs[i], proc_params[i], joints[i],
                       verts[i], cams[i], outfilename)
 
-        os.system("ffmpeg -y -i {}/temp_%5d.png -pix_fmt yuv420p -r 5 output/visualize_2d.mp4".format(tempdir))
+        os.system("ffmpeg -y -i {}/temp_%5d.png -pix_fmt yuv420p -r 5 {}/visualize_2d.mp4".format(tempdir, vis_path))
         shutil.rmtree(tempdir)
 
     def _p2d(self, img, proc_param, joints, verts, cam, outfilename):
