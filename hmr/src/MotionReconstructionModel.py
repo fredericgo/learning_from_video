@@ -165,7 +165,7 @@ class MotionReconstructionModel(object):
         verts, Js, _, _ = self.smpl(shapes, poses, get_skin=True)
         # Project to 2D!
         pred_kp = self.proj_fn(Js, cams, name='proj_2d_stage%d' % i)
-        return pred_kp, poses, Js
+        return verts, pred_kp, poses, cams, Js
 
     def prepare(self):
         print('Restoring checkpoint %s..' % self.load_path)
@@ -183,7 +183,8 @@ class MotionReconstructionModel(object):
         x2d0 = results['joints']
         q3d0 = results['theta'][:,self.num_cam:(self.num_cam + self.num_theta)]
         z0 = results['hidden']
-        x2d, q3d, J3d = self.morec_model(z0, x2d0)
+        verts, x2d, q3d, Rs, J3d = self.morec_model(z0, x2d0)
+
         l_2d = tf.reduce_sum(tf.abs(x2d-x2d0))
         l_3d = tf.reduce_sum(tf.abs(q3d-q3d0))
         l_sm = tf.reduce_sum(tf.squared_difference(J3d[1:], J3d[:-1]))
@@ -205,10 +206,9 @@ class MotionReconstructionModel(object):
             _, x_val, loss_value = self.sess.run((train, x2d, loss))
             print("step {}, loss = {}".format(i, loss_value))
 
-        q3d_pred, j3d_pred = self.sess.run([q3d, J3d])
-        cams = results['cams']
-        return q3d0, q3d_pred, j3d_pred, cams #results['joints3d']
-
+        verts_p, j2d, q3d_pred, j3d_pred, cams = self.sess.run([verts, x2d, q3d, J3d, Rs])
+        #cams = results['cams']
+        return verts, j2d, q3d_pred, j3d_pred, cams #results['joints3d']
 
     def initial_predict(self, images):
         """
