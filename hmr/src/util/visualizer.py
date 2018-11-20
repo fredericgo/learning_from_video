@@ -4,7 +4,7 @@ from mpl_toolkits import mplot3d
 import tempfile
 import os
 import shutil
-from . import renderer as vis_util
+import renderer as vis_util
 import matplotlib.pyplot as plt
 
 class Visualizer(object):
@@ -25,15 +25,15 @@ class Visualizer(object):
 
 
     def plot_2d(self, imgs, proc_params, joints, verts, cams, vis_path):
-        num_imgs = imgs.shape[0]
+        num_imgs = len(imgs)
         tempdir = tempfile.mkdtemp()
-        for i in enumerate(num_imgs):
+        for i in range(num_imgs):
             outfilename = os.path.join(tempdir, 'temp_{:05d}.png'.format(i))
             self._p2d(imgs[i], proc_params[i], joints[i],
                       verts[i], cams[i], outfilename)
 
         os.system("ffmpeg -y -i {}/temp_%5d.png -pix_fmt yuv420p -r 5 {}/visualize_2d.mp4".format(tempdir, vis_path))
-        shutil.rmtree(tempdir)
+        #shutil.rmtree(tempdir)
 
     def _p2d(self, img, proc_param, joints, verts, cam, outfilename):
         cam_for_render, vert_shifted, joints_orig = vis_util.get_original(
@@ -41,7 +41,7 @@ class Visualizer(object):
 
         # Render results
         skel_img = vis_util.draw_skeleton(img, joints_orig)
-        rend_img_overlay = renderer(
+        rend_img_overlay = self.renderer(
             vert_shifted, cam=cam_for_render, img=img, do_alpha=True)
         plt.figure(1)
         plt.clf()
@@ -57,9 +57,9 @@ class Visualizer(object):
         plt.imshow(rend_img_overlay)
         plt.title('3D Mesh overlay')
         plt.axis('off')
+        plt.savefig(outfilename)
 
-        
-
+    
     def _p3d(self, joints, filename):
         parents = [1, 2, 12, 12, 3, 4, 7, 8, 12, 12, 9, 10, 13, 13, 13]
         #parents = [0,  0,  0,  0,  1,  2,  3,  4,  5,  6,  7,  8,  

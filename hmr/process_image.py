@@ -13,9 +13,11 @@ if __name__ == "__main__":
     config(sys.argv)
     config.load_path = src.config.PRETRAINED_MODEL
 
+    skill = "skating"
+
     video_motion_process = VideoMotionProcessor(config)
-    img_dir = "data/youtube/baseball_pitch/"
-    motion_path = "/home/fredericgo/DeepMimic/data/motions/humanoid3d_pitch.txt"
+    img_dir = "data/youtube/{}/".format(skill)
+    motion_path = "/home/fredericgo/DeepMimic/data/motions/humanoid3d_{}.txt".format(skill)
     vis_path = "output"
     video_motion_process(img_dir, motion_path, vis_path)
 

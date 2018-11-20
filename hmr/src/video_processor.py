@@ -75,9 +75,9 @@ class VideoMotionProcessor(object):
     def _convert_smpl_to_deepmimic(self, q3d, cams, process_params):
         return smpl_to_deepmimic(q3d, cams, process_params)
 
-    def _save_visualization(self, img, J3d, proc_params, joints, verts, cams, vis_path):
-        self._visualizer.plot3d(J3d, vis_path)
-        self._visualizer.plot2d(imgs, proc_params, joints, verts, cams, vis_path)
+    def _save_visualization(self, imgs, J3d, proc_params, joints, verts, cams, vis_path):
+        self._visualizer.plot_3d(J3d, vis_path)
+        self._visualizer.plot_2d(imgs, proc_params, joints, verts, cams, vis_path)
 
     def _save_motion(self, data, filename):
         mfile = dict()

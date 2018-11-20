@@ -98,32 +98,36 @@ def build_kinematic_tree(theta, cam, proc_param):
     theta = theta.reshape((-1,3))
     z = np.zeros(44)
 
+    r = [0.7071, 0, 0.7071, 0] # SMPL to DeepMimic
     z[1:4] = calcRootTranslation(cam, proc_param)
     for joi, num in joints.items():
         x = theta[num]
-        # change of coordinates from SMPL to DeepMimic
+        # change of basis: SMPL to DeepMimic
         if joi in ['R_Knee', 'L_Knee']:
-            q = vec_to_angle(x)
-        elif joi in ['L_Elbow', 'R_Elbow']:
             q = -vec_to_angle(x)
+        elif joi in ['L_Elbow', 'R_Elbow']:
+            q = vec_to_angle(x)
         elif joi in ['Pelvis']:
             q = vec_to_quaternion(x)
-            q = qq.qmult([0.7071, 0, -0.7071, 0], q)
+            q = qq.qmult(r, q)
+            q = qq.qmult(q, qq.qconjugate(r))
             q = qq.qmult([0, 1, 0, 0], q)
         elif joi in ['L_Shoulder']:
             q = vec_to_quaternion(x)
             q = qq.qmult(q, [0.7071, 0, 0, 0.7071])
-            q = qq.qmult([0.7071, 0, -0.7071, 0], q)
+            q = qq.qmult(r, q)
+            q = qq.qmult(q, qq.qconjugate(r))
         elif joi in ['R_Shoulder']:
             q = vec_to_quaternion(x)
             q = qq.qmult(q, [0.7071, 0, 0, -0.7071])
-            q = qq.qmult([0.7071, 0, -0.7071, 0], q)
+            q = qq.qmult(r, q)
+            q = qq.qmult(q, qq.qconjugate(r))
         else:
             q = vec_to_quaternion(x)
-            q = qq.qmult([0.7071, 0, -0.7071, 0], q)
+            q = qq.qmult(r, q)
+            q = qq.qmult(q, qq.qconjugate(r))
         z[target_joints[joi]] = q
     return z
-
 
 class MoRecSkeletonExtractor:
     def __init__(self, config):

@@ -208,7 +208,7 @@ class MotionReconstructionModel(object):
 
         verts_p, j2d, q3d_pred, j3d_pred, cams = self.sess.run([verts, x2d, q3d, J3d, Rs])
         #cams = results['cams']
-        return verts, j2d, q3d_pred, j3d_pred, cams #results['joints3d']
+        return verts_p, j2d, q3d_pred, j3d_pred, cams #results['joints3d']
 
     def initial_predict(self, images):
         """
