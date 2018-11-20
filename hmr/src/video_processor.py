@@ -1,10 +1,13 @@
 import os
 import numpy as np
+import json
 import skimage.io as io
 
 from src.tf_pose.get_people import get_people
 from src.util import openpose as op_util
 from src.util import image as img_util
+from smpl_to_deepmimic import (smpl_to_deepmimic)
+from .MotionReconstructionModel import MotionReconstructionModel
 
 
 def crop_around_person(img):
@@ -32,7 +35,9 @@ class VideoMotionProcessor(object):
     def __call__(self, img_dir):
         input_img_seq, process_params, img = self._preprocess(img_dir)
         q3d0, q3d, J3d, cams = self._predict(input_img_seq)
-        x3d = self._convert_smpl_to_deepmimic(q3d, cams, process_params):
+        x3d = self._convert_smpl_to_deepmimic(q3d, cams, process_params)
+        self._save_motion(x3d, "motion.txt")
+        self._save_visualization(img, )
 
     def _preprocess(self, img_dir):
         files = [f for f in os.listdir(img_dir)
@@ -66,12 +71,17 @@ class VideoMotionProcessor(object):
     def _predict(self, img_seq):
         return self._model.predict(img_seq)
 
-    def _convert_smpl_to_deepmimic(self, smpl_joints):
+    def _convert_smpl_to_deepmimic(self, q3d, cams, process_params):
+        smpl_to_deepmimic(q3d, cams, process_params)
 
-
-    def _visualize(self):
+    def _save_visualization(self):
         return
 
-    def _save_motion(self):
-        return
+    def _save_motion(self, data, filename):
+        mfile = dict()
+        mfile['Loop'] = 'wrap'
+        data[:, 0] = 0.0333
+        mfile['Frames'] = data.tolist()
+        with open(filename, 'w') as f:
+            json.dump(mfile, f, indent=2)
 

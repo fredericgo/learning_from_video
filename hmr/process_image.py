@@ -14,7 +14,7 @@ if __name__ == "__main__":
     config.load_path = src.config.PRETRAINED_MODEL
 
     video_motion_process = VideoMotionProcessor(config)
-    img_dir = "data/youtube/skating/"
+    img_dir = "data/youtube/baseball_pitch/"
     video_motion_process(img_dir)
 
 

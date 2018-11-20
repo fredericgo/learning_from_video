@@ -1,10 +1,45 @@
 import numpy as np
+from transforms3d import quaternions as qq
 
-def smpl_to_deepmimc(q3d, cams, process_params)
+
+joints = {
+    'Pelvis': 0,
+    'Neck': 12,
+    'Chest': 3,
+    'L_Shoulder': 16, 'L_Elbow': 18,
+    'R_Shoulder': 17, 'R_Elbow': 19,
+    'L_Hip': 1,       'L_Knee': 4, 'L_Ankle': 7,
+    'R_Hip': 2,       'R_Knee': 5, 'R_Ankle': 8
+}
+
+# LR reverse for deepmimic
+target_joints = {
+    'Pelvis': [4, 5, 6, 7],
+    'Neck':  [12, 13, 14, 15],
+    'Chest': [8, 9, 10, 11],
+    'L_Shoulder':  [39, 40, 41, 42], 'L_Elbow': [43],
+    'R_Shoulder':  [25, 26, 27, 28], 'R_Elbow': [29],
+    'L_Hip': [30, 31, 32, 33],      'L_Knee': [34],       'L_Ankle': [35, 36, 37, 38],
+    'R_Hip': [16, 17, 18, 19],      'R_Knee': [20],       'R_Ankle': [21, 22, 23, 24],
+}
+
+
+def vec_to_quaternion(x):
+    th = np.linalg.norm(x)
+    x_norm = x / th
+    q = qq.axangle2quat(x_norm, th)
+    return q
+
+def vec_to_angle(x):
+    th = np.linalg.norm(x)
+    x_norm = x / th
+    return th
+
+def smpl_to_deepmimic(q3d, cams, process_params):
     num_steps = q3d.shape[0]
     x3d = np.zeros((num_steps, 44))
     for i in range(num_steps):
-        x3d[i] = build_kinematic_tree(q3d0[i], cams[i], process_params[i])
+        x3d[i] = build_kinematic_tree(q3d[i], cams[i], process_params[i])
     return x3d
 
 def calcRootTranslation(cam, proc_param):
@@ -73,19 +108,19 @@ def build_kinematic_tree(theta, cam, proc_param):
             q = -vec_to_angle(x)
         elif joi in ['Pelvis']:
             q = vec_to_quaternion(x)
-            q = quaternions.qmult([0.7071, 0, -0.7071, 0], q)
-            q = quaternions.qmult([0, 1, 0, 0], q)
+            q = qq.qmult([0.7071, 0, -0.7071, 0], q)
+            q = qq.qmult([0, 1, 0, 0], q)
         elif joi in ['L_Shoulder']:
             q = vec_to_quaternion(x)
-            q = quaternions.qmult(q, [0.7071, 0, 0, 0.7071])
-            q = quaternions.qmult([0.7071, 0, -0.7071, 0], q)
+            q = qq.qmult(q, [0.7071, 0, 0, 0.7071])
+            q = qq.qmult([0.7071, 0, -0.7071, 0], q)
         elif joi in ['R_Shoulder']:
             q = vec_to_quaternion(x)
-            q = quaternions.qmult(q, [0.7071, 0, 0, -0.7071])
-            q = quaternions.qmult([0.7071, 0, -0.7071, 0], q)
+            q = qq.qmult(q, [0.7071, 0, 0, -0.7071])
+            q = qq.qmult([0.7071, 0, -0.7071, 0], q)
         else:
             q = vec_to_quaternion(x)
-            q = quaternions.qmult([0.7071, 0, -0.7071, 0], q)
+            q = qq.qmult([0.7071, 0, -0.7071, 0], q)
         z[target_joints[joi]] = q
     return z
 
@@ -93,9 +128,6 @@ def build_kinematic_tree(theta, cam, proc_param):
 class MoRecSkeletonExtractor:
     def __init__(self, config):
         pass
-
-    @static
-    def 
 
     def __call__(self, img_path, get_J3d=False):
         input_img_seq, process_params = self._preprocess(img_path)
