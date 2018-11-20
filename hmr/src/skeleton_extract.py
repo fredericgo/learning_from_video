@@ -1,62 +1,6 @@
-import logging
-import sys
-import time
-import os
+from .skeleton_extract import Extractor
 
-import numpy as np
-import skimage.io as io
-from src.util import image as img_util
-from src.util import openpose as op_util
 
-from src.tf_pose.get_people import get_people
-import tensorflow as tf
-from .MotionReconstructionModel import MotionReconstructionModel
-import src.config as config
-import matplotlib.pyplot as plt
-
-from transforms3d.axangles import axangle2mat
-from transforms3d import quaternions as qq
-
-smpl_joint_names = {
-    0:  'Pelvis',
-    1:  'L_Hip',        4:  'L_Knee',            7:  'L_Ankle',           10: 'L_Foot',
-    2:  'R_Hip',        5:  'R_Knee',            8:  'R_Ankle',           11: 'R_Foot',
-    3:  'Spine1',       6:  'Spine2',            9:  'Spine3',            12: 'Neck',            15: 'Head',
-    13: 'L_Collar',     16: 'L_Shoulder',       18: 'L_Elbow',            20: 'L_Wrist',         22: 'L_Hand',
-    14: 'R_Collar',     17: 'R_Shoulder',       19: 'R_Elbow',            21: 'R_Wrist',         23: 'R_Hand',
-}
-
-joints = {
-    'Pelvis': 0,
-    'Neck': 12,
-    'Chest': 3,
-    'L_Shoulder': 16, 'L_Elbow': 18,
-    'R_Shoulder': 17, 'R_Elbow': 19,
-    'L_Hip': 1,       'L_Knee': 4, 'L_Ankle': 7,
-    'R_Hip': 2,       'R_Knee': 5, 'R_Ankle': 8
-}
-
-# LR reverse for deepmimic
-target_joints = {
-    'Pelvis': [4, 5, 6, 7],
-    'Neck':  [12, 13, 14, 15],
-    'Chest': [8, 9, 10, 11],
-    'L_Shoulder':  [39, 40, 41, 42], 'L_Elbow': [43],
-    'R_Shoulder':  [25, 26, 27, 28], 'R_Elbow': [29],
-    'L_Hip': [30, 31, 32, 33],      'L_Knee': [34],       'L_Ankle': [35, 36, 37, 38],
-    'R_Hip': [16, 17, 18, 19],      'R_Knee': [20],       'R_Ankle': [21, 22, 23, 24],
-}
-
-def vec_to_quaternion(x):
-    th = np.linalg.norm(x)
-    x_norm = x / th
-    q = qq.axangle2quat(x_norm, th)
-    return q
-
-def vec_to_angle(x):
-    th = np.linalg.norm(x)
-    x_norm = x / th
-    return th
 
 class MoRecSkeletonExtractor:
     def __init__(self, config):
@@ -118,7 +62,7 @@ class MoRecSkeletonExtractor:
     def _preprocess(self, img_dir):
         files = [f for f in os.listdir(img_dir)
                      if os.path.isfile(os.path.join(img_dir, f))]
-        files = sorted(files,
+        files = sorted(onlyfiles,
                            key=lambda f: int(f.rsplit('.')[0].split('_')[-1]))
 
         N = len(files)
@@ -180,33 +124,29 @@ class MoRecSkeletonExtractor:
         theta = theta.reshape((-1,3))
         z = np.zeros(44)
 
-        r = [0.7071, 0, 0.7071, 0] # SMPL to DeepMimic
         z[1:4] = calcRootTranslation(cam, proc_param)
         for joi, num in joints.items():
             x = theta[num]
-            # change of basis: SMPL to DeepMimic
+            # change of coordinates from SMPL to DeepMimic
             if joi in ['R_Knee', 'L_Knee']:
-                q = -vec_to_angle(x)
-            elif joi in ['L_Elbow', 'R_Elbow']:
                 q = vec_to_angle(x)
+            elif joi in ['L_Elbow', 'R_Elbow']:
+                q = -vec_to_angle(x)
             elif joi in ['Pelvis']:
                 q = vec_to_quaternion(x)
-                q = qq.qmult(r, q)
-                q = qq.qmult(q, qq.qconjugate(r))
-                q = qq.qmult([0, 1, 0, 0], q)
+                q = quaternions.qmult([0.7071, 0, -0.7071, 0], q)
+                q = quaternions.qmult([0, 1, 0, 0], q)
             elif joi in ['L_Shoulder']:
                 q = vec_to_quaternion(x)
-                q = qq.qmult(q, [0.7071, 0, 0, 0.7071])
-                q = qq.qmult(r, q)
-                q = qq.qmult(q, qq.qconjugate(r))
+                q = quaternions.qmult(q, [0.7071, 0, 0, 0.7071])
+                q = quaternions.qmult([0.7071, 0, -0.7071, 0], q)
             elif joi in ['R_Shoulder']:
                 q = vec_to_quaternion(x)
-                q = qq.qmult(q, [0.7071, 0, 0, -0.7071])
-                q = qq.qmult(r, q)
-                q = qq.qmult(q, qq.qconjugate(r))
+                q = quaternions.qmult(q, [0.7071, 0, 0, -0.7071])
+                q = quaternions.qmult([0.7071, 0, -0.7071, 0], q)
             else:
                 q = vec_to_quaternion(x)
-                q = qq.qmult(r, q)
-                q = qq.qmult(q, qq.qconjugate(r))
+                q = quaternions.qmult([0.7071, 0, -0.7071, 0], q)
+
             z[target_joints[joi]] = q
         return z

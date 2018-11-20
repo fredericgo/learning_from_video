@@ -6,7 +6,7 @@ from src.MoRecSkeletonExtractor import MoRecSkeletonExtractor
 import numpy as np
 import json
 import tempfile
-from src.util.plot_3d_to_img import J3dPlotter
+from src.util.visualizer import Visualizer
 
 config = flags.FLAGS
 config(sys.argv)
@@ -26,4 +26,4 @@ mfile['Frames'] = z_pred.tolist()
 with open('/home/fredericgo/DeepMimic/data/motions/humanoid3d_skating.txt', 'w') as f:
 	json.dump(mfile, f, indent=2)
 
-J3dPlotter().plot(j3d)
+Visualizer().plot(j3d)
