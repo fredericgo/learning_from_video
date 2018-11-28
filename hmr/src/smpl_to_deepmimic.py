@@ -55,8 +55,9 @@ def calcRootTranslation(cam, proc_param):
     final_principal_pt = (principal_pt + start_pt) * undo_scale
     pp_orig = final_principal_pt / (img_size*undo_scale)
     trans = np.hstack([pp_orig, tz])
+    #trans[0], trans[1], trans[2] =  trans[0], trans[1], 0
+    print(trans)
     return trans
-
 
 def build_kinematic_tree(theta, cam, proc_param):
     """
@@ -164,7 +165,6 @@ class MoRecSkeletonExtractor:
         pp_orig = final_principal_pt / (img_size*undo_scale)
         trans = np.hstack([pp_orig, tz])
         return trans
-
 
 
     def kinematicTree(self, cam, proc_param, theta):

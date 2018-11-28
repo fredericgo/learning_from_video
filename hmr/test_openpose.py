@@ -159,7 +159,9 @@ def preprocess_image(img_path, kps):
 def main(img_path):
     sess = tf.Session()
     model = RunModel(config, sess=sess)
-    kps = get_people(img_path)
+    img = io.imread(img_path)
+    kps = get_people(img)
+    print(kps)
 
     input_img, proc_param, img = preprocess_image(img_path, kps)
     # Add batch dimension: 1 x D x D x 3

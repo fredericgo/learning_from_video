@@ -11,6 +11,7 @@ from .MotionReconstructionModel import MotionReconstructionModel
 from src.util.visualizer import Visualizer
 
 def crop_around_person(img):
+
     kps = get_people(img)
 
     if img.shape[2] == 4:
@@ -56,6 +57,8 @@ class VideoMotionProcessor(object):
 
         i_succ = 0
         for i, img in enumerate(imgs):
+            img[:, :, 0], img[:, :, 1], img[:, :, 2] = img[:, :, 2], img[:, :, 1], img[:, :, 0]
+
             print("File: {}".format(i))
             try:
                 input_img, param = crop_around_person(img)

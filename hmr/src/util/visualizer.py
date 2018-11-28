@@ -6,6 +6,7 @@ import os
 import shutil
 import renderer as vis_util
 import matplotlib.pyplot as plt
+import numpy as np
 
 class Visualizer(object):
     def __init__(self):
@@ -36,24 +37,26 @@ class Visualizer(object):
         #shutil.rmtree(tempdir)
 
     def _p2d(self, img, proc_param, joints, verts, cam, outfilename):
+        joints = np.expand_dims(joints, axis=0)
+
         cam_for_render, vert_shifted, joints_orig = vis_util.get_original(
             proc_param, verts, cam, joints, img_size=img.shape[:2])
-
+        
         # Render results
         skel_img = vis_util.draw_skeleton(img, joints_orig)
         rend_img_overlay = self.renderer(
             vert_shifted, cam=cam_for_render, img=img, do_alpha=True)
         plt.figure(1)
         plt.clf()
-        plt.subplot(131)
+        plt.subplot(121)
         plt.imshow(img)
         plt.title('input')
         plt.axis('off')
-        plt.subplot(132)
-        plt.imshow(skel_img)
-        plt.title('joint projection')
-        plt.axis('off')
-        plt.subplot(133)
+        #plt.subplot(132)
+        #plt.imshow(skel_img)
+        #plt.title('joint projection')
+        #plt.axis('off')
+        plt.subplot(122)
         plt.imshow(rend_img_overlay)
         plt.title('3D Mesh overlay')
         plt.axis('off')

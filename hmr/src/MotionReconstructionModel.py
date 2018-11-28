@@ -178,6 +178,7 @@ class MotionReconstructionModel(object):
         Preprocessed to range [-1, 1]
         """
         images = images
+        img_size = images[0].shape[:2]
         num_steps = len(images)
         results = self.initial_predict(images)
         x2d0 = results['joints']
@@ -208,6 +209,7 @@ class MotionReconstructionModel(object):
 
         verts_p, j2d, q3d_pred, j3d_pred, cams = self.sess.run([verts, x2d, q3d, J3d, Rs])
         #cams = results['cams']
+        j2d = ((j2d + 1) * 0.5) * img_size
         return verts_p, j2d, q3d_pred, j3d_pred, cams #results['joints3d']
 
     def initial_predict(self, images):

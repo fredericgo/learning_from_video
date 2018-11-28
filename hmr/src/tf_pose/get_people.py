@@ -11,7 +11,7 @@ from .networks import get_graph_path, model_wh
 
 parser = argparse.ArgumentParser(description='tf-pose-estimation run')
 parser.add_argument('--image', type=str, default='./data/coco1.png')
-parser.add_argument('--model', type=str, default='mobilenet_thin', help='cmu / mobilenet_thin')
+parser.add_argument('--model', type=str, default='cmu', help='cmu / mobilenet_thin')
 
 parser.add_argument('--resize', type=str, default='0x0',
                         help='if provided, resize images before they are processed. default=0x0, Recommends : 432x368 or 656x368 or 1312x736 ')
@@ -31,7 +31,7 @@ def read_imgfile(path, width=None, height=None):
     return val_image
 
 def get_people(image):
-    image[:, :, 0], image[:, :, 1], image[:, :, 2] = image[:, :, 2], image[:, :, 1], image[:, :, 0]
+    #image[:, :, 0], image[:, :, 1], image[:, :, 2] = image[:, :, 2], image[:, :, 1], image[:, :, 0]
     wo, ho = image.shape[0], image.shape[1]
 
     if image is None:
