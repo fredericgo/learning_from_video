@@ -60,8 +60,7 @@ class MultiPoseNetEstimator(object):
         self.model.eval()
         self.model.module.freeze_bn()
 
-    def infer(self, image_file):
-        img = cv2.imread(image_file).astype(np.float32)
+    def infer(self, img):
         shape_dst = np.max(img.shape)
         scale = float(shape_dst) / self.params.inp_size
         pad_size = np.abs(img.shape[1] - img.shape[0])
@@ -104,7 +103,7 @@ class MultiPoseNetEstimator(object):
             if int(classification[idxs[0][j]]) == 0:  # class0=people
                 bboxs.append(bbox.tolist())
 
-        prn_result = self.prn_process(joint_list, bboxs, image_file)
+        prn_result = self.prn_process(joint_list, bboxs, None)
         results = []
         for prn in prn_result:
             results.append(np.array(prn['keypoints']).reshape(-1, 3))
