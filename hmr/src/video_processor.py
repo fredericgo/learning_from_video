@@ -20,9 +20,11 @@ def crop_around_person(img):
     if img.shape[2] == 4:
         img = img[:, :, :3]
 
-    scale, center = op_util.get_bbox_dict(kps)
+    scale, center, min_pt, max_pt = op_util.get_bbox(kps)
     crop, proc_param = img_util.scale_and_crop(img, scale, center,
                                                224)
+    proc_param['min_pt'] = min_pt
+    proc_param['max_pt'] = max_pt
     # Normalize image to [-1, 1]
     crop = 2 * ((crop / 255.) - 0.5)
     # Add batch dimension: 1 x D x D x 3
