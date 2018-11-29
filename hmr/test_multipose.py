@@ -82,6 +82,15 @@ def visualize(img, proc_param, joints, verts, cam):
     # import ipdb
     # ipdb.set_trace()
 
+def plot_crop(crop):
+    import matplotlib.pyplot as plt
+    plt.figure(1)
+    plt.clf()
+    plt.imshow(crop)
+    plt.draw()
+    plt.show()
+
+
 def p3d(joints, cam, proc_param):
     #(0 - r ankle,
     # 1 - r knee,
@@ -163,12 +172,13 @@ def main(img_path):
     kps = multipose_get_people(img)
 
     input_img, proc_param, img = preprocess_image(img_path, kps)
+
+    plot_crop(input_img)
     # Add batch dimension: 1 x D x D x 3
     input_img = np.expand_dims(input_img, 0)
 
     joints, verts, cams, joints3d, theta = model.predict(
         input_img, get_theta=True)
-    print(joints3d.shape)
 
     p3d(joints3d, cams[0], proc_param)
     #visualize(img, proc_param, joints[0], verts[0], cams[0])
