@@ -53,13 +53,14 @@ class Visualizer(object):
         #rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         #overlay_rgb = cv2.cvtColor(rend_img_overlay, cv2.COLOR_BGR2RGB)
 
-        plt.figure(1)
-        plt.clf()
-        ax = plt.subplot(121)
+        fig = Figure()
+        fig.clf()
+        ax = fig.subplot(121)
         ax.imshow(img)
         # Create a Rectangle patch
         x1, y1 = proc_param['start_pt']
         x2, y2 = proc_param['end_pt']
+        print(w, h)
         w, h = x2-x1, y2-y1 
         rect = patches.Rectangle((x1, y1), w, h,linewidth=1,edgecolor='r',facecolor='none')
 
@@ -71,11 +72,12 @@ class Visualizer(object):
         #plt.imshow(skel_img)
         #plt.title('joint projection')
         #plt.axis('off')
-        plt.subplot(122)
-        plt.imshow(rend_img_overlay)
-        plt.title('3D Mesh overlay')
-        plt.axis('off')
-        plt.savefig(outfilename)
+        ax = fig.subplot(122)
+        ax.imshow(rend_img_overlay)
+        ax.set_title('3D Mesh overlay')
+        ax.axis('off')
+        canvas = FigureCanvasAgg(fig)
+        canvas.print_figure(outfilename)        
 
     
     def _p3d(self, joints, filename):
