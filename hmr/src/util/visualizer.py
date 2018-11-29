@@ -7,6 +7,7 @@ import shutil
 import renderer as vis_util
 import matplotlib.pyplot as plt
 import numpy as np
+import cv2
 
 class Visualizer(object):
     def __init__(self):
@@ -30,9 +31,8 @@ class Visualizer(object):
         tempdir = tempfile.mkdtemp()
         for i in range(num_imgs):
             outfilename = os.path.join(tempdir, 'temp_{:05d}.png'.format(i))
-            rgb = cv2.cvtColor(imgs[i], cv2.COLOR_BGR2RGB)
 
-            self._p2d(rgb, proc_params[i], joints[i],
+            self._p2d(imgs[i], proc_params[i], joints[i],
                       verts[i], cams[i], outfilename)
 
         os.system("ffmpeg -y -i {}/temp_%5d.png -pix_fmt yuv420p -r 5 {}/visualize_2d.mp4".format(tempdir, vis_path))
@@ -48,6 +48,9 @@ class Visualizer(object):
         skel_img = vis_util.draw_skeleton(img, joints_orig)
         rend_img_overlay = self.renderer(
             vert_shifted, cam=cam_for_render, img=img, do_alpha=True)
+        #rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        #overlay_rgb = cv2.cvtColor(rend_img_overlay, cv2.COLOR_BGR2RGB)
+
         plt.figure(1)
         plt.clf()
         plt.subplot(121)

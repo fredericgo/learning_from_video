@@ -4,6 +4,7 @@ import json
 import skimage.io as io
 
 from src.tf_pose.get_people import get_people
+from src.pytorch_multipose.multipose_get_people import multipose_get_people
 from src.util import openpose as op_util
 from src.util import image as img_util
 from smpl_to_deepmimic import (smpl_to_deepmimic)
@@ -14,7 +15,7 @@ import cv2
 
 def crop_around_person(img):
 
-    kps = get_people(img)
+    kps = multipose_get_people(img)
 
     if img.shape[2] == 4:
         img = img[:, :, :3]
@@ -59,7 +60,7 @@ class VideoMotionProcessor(object):
 
         i_succ = 0
         for i, img in enumerate(imgs):
-            img[:, :, 0], img[:, :, 1], img[:, :, 2] = img[:, :, 2], img[:, :, 1], img[:, :, 0]
+            #img[:, :, 0], img[:, :, 1], img[:, :, 2] = img[:, :, 2], img[:, :, 1], img[:, :, 0]
             img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
             print("File: {}".format(i))
             try:
