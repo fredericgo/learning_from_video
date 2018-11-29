@@ -6,6 +6,8 @@ import os
 import shutil
 import renderer as vis_util
 import matplotlib.pyplot as plt
+import matplotlib.patches as patches
+
 import numpy as np
 import cv2
 
@@ -48,16 +50,23 @@ class Visualizer(object):
         skel_img = vis_util.draw_skeleton(img, joints_orig)
         rend_img_overlay = self.renderer(
             vert_shifted, cam=cam_for_render, img=img, do_alpha=True)
-        img = self._draw_bbox(img, proc_param['start_pt'], proc_param['end_pt'])
         #rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         #overlay_rgb = cv2.cvtColor(rend_img_overlay, cv2.COLOR_BGR2RGB)
 
         plt.figure(1)
         plt.clf()
-        plt.subplot(121)
-        plt.imshow(img)
-        plt.title('input')
-        plt.axis('off')
+        ax = plt.subplot(121)
+        ax.imshow(img)
+        # Create a Rectangle patch
+        x1, y1 = proc_param['start_pt']
+        x2, y2 = proc_param['end_pt']
+        w, h = x2-x1, y2-y1 
+        rect = patches.Rectangle((x1, y1), w, h,linewidth=1,edgecolor='r',facecolor='none')
+
+        # Add the patch to the Axes
+        ax.add_patch(rect)
+        ax.set_title('input')
+        ax.axis('off')
         #plt.subplot(132)
         #plt.imshow(skel_img)
         #plt.title('joint projection')
@@ -91,8 +100,5 @@ class Visualizer(object):
             ax.plot(x_pair, y_pair, zs=z_pair, linewidth=3)
         ax.axis('off')
         canvas = FigureCanvasAgg(fig)
-        canvas.print_figure(filename)
-
-    def _draw_bbox(self, img, start, end):
-        cv2.rectangle(img,(start[0], start[1]),(end[0], end[1]), (0,255,0), 2)
+        canvas.print_figure(filename)        
 
