@@ -2,7 +2,9 @@ from __future__ import print_function
 import numpy as np
 import math
 import cv2
-
+import os, sys
+root_path = os.path.realpath(__file__).split('/evaluate/multi_pose_net_estimator.py')[0]
+sys.path.append(root_path)
 import torch
 import torch.nn as nn
 from lib.utils.log import logger

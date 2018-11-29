@@ -13,7 +13,7 @@ from src.util import openpose as op_util
 from src.util import renderer as vis_util
 
 from src.tf_pose.get_people import get_people
-from src.pytorch_multipose import multipose_get_people
+from src.pytorch_multipose.multipose_get_people import multipose_get_people
 import tensorflow as tf
 from src.RunModel import RunModel
 import src.config
@@ -103,7 +103,6 @@ def p3d(joints, cam, proc_param):
 
     import matplotlib.pyplot as plt
     from mpl_toolkits import mplot3d
-    print(joints.shape)
     joints = joints[0,:14,:]
 
     img_size = proc_param['img_size']
@@ -161,8 +160,7 @@ def main(img_path):
     sess = tf.Session()
     model = RunModel(config, sess=sess)
     img = io.imread(img_path)
-    kps = get_people(img)
-    print(kps)
+    kps = multipose_get_people(img)
 
     input_img, proc_param, img = preprocess_image(img_path, kps)
     # Add batch dimension: 1 x D x D x 3

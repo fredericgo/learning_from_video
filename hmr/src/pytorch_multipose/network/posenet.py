@@ -1,5 +1,8 @@
 # -*- coding:utf-8 -*-
 # keypoint subnet + detection subnet(RetinaNet) + PRN
+import os, sys
+root_path = os.path.realpath(__file__).split('/network/posenet.py')[0]
+sys.path.append(root_path)
 import math
 import torch
 import torch.nn as nn
@@ -12,7 +15,7 @@ from torch.nn import init
 
 from network.utils import BBoxTransform, ClipBoxes
 from network.anchors import Anchors
-import network.losses as losses
+import losses as losses
 from lib.nms.pth_nms import pth_nms
 
 
