@@ -48,6 +48,7 @@ class Visualizer(object):
         skel_img = vis_util.draw_skeleton(img, joints_orig)
         rend_img_overlay = self.renderer(
             vert_shifted, cam=cam_for_render, img=img, do_alpha=True)
+        img = self._draw_bbox(img, proc_param['start_pt'], proc_param['end_pt'])
         #rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         #overlay_rgb = cv2.cvtColor(rend_img_overlay, cv2.COLOR_BGR2RGB)
 
@@ -91,3 +92,7 @@ class Visualizer(object):
         ax.axis('off')
         canvas = FigureCanvasAgg(fig)
         canvas.print_figure(filename)
+
+    def _draw_bbox(self, img, start, end):
+        cv2.rectangle(img,(start[0], start[1]),(end[0], end[1]), (0,255,0), 2)
+
