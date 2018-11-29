@@ -10,6 +10,8 @@ from smpl_to_deepmimic import (smpl_to_deepmimic)
 from .MotionReconstructionModel import MotionReconstructionModel
 from src.util.visualizer import Visualizer
 
+import cv2
+
 def crop_around_person(img):
 
     kps = get_people(img)
@@ -58,7 +60,7 @@ class VideoMotionProcessor(object):
         i_succ = 0
         for i, img in enumerate(imgs):
             img[:, :, 0], img[:, :, 1], img[:, :, 2] = img[:, :, 2], img[:, :, 1], img[:, :, 0]
-
+            img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
             print("File: {}".format(i))
             try:
                 input_img, param = crop_around_person(img)

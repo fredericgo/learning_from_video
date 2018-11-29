@@ -30,7 +30,9 @@ class Visualizer(object):
         tempdir = tempfile.mkdtemp()
         for i in range(num_imgs):
             outfilename = os.path.join(tempdir, 'temp_{:05d}.png'.format(i))
-            self._p2d(imgs[i], proc_params[i], joints[i],
+            rgb = cv2.cvtColor(imgs[i], cv2.COLOR_BGR2RGB)
+
+            self._p2d(rgb, proc_params[i], joints[i],
                       verts[i], cams[i], outfilename)
 
         os.system("ffmpeg -y -i {}/temp_%5d.png -pix_fmt yuv420p -r 5 {}/visualize_2d.mp4".format(tempdir, vis_path))
