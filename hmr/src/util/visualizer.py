@@ -55,13 +55,13 @@ class Visualizer(object):
 
         fig = Figure()
         fig.clf()
-        ax = fig.subplot(121)
+        ax = fig.add_subplot(121)
         ax.imshow(img)
         # Create a Rectangle patch
-        x1, y1 = proc_param['start_pt']
-        x2, y2 = proc_param['end_pt']
-        print(w, h)
+        x1, y1 = proc_param['min_pt']
+        x2, y2 = proc_param['max_pt']
         w, h = x2-x1, y2-y1 
+        print(w, h)
         rect = patches.Rectangle((x1, y1), w, h,linewidth=1,edgecolor='r',facecolor='none')
 
         # Add the patch to the Axes
@@ -72,7 +72,7 @@ class Visualizer(object):
         #plt.imshow(skel_img)
         #plt.title('joint projection')
         #plt.axis('off')
-        ax = fig.subplot(122)
+        ax = fig.add_subplot(122)
         ax.imshow(rend_img_overlay)
         ax.set_title('3D Mesh overlay')
         ax.axis('off')

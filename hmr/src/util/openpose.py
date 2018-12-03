@@ -16,7 +16,7 @@ def read_json(json_path):
 
 
 def get_bbox(kps, vis_thr=0.2):
-    if isinstance(json_path, basestring):
+    if isinstance(kps, basestring):
         kps = read_json(kps)        
     # Pick the most confident detection.
     scores = [np.mean(kp[kp[:, 2] > vis_thr, 2]) for kp in kps]
