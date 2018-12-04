@@ -186,9 +186,9 @@ class MotionReconstructionModel(object):
         z0 = results['hidden']
         verts, x2d, q3d, Rs, J3d = self.morec_model(z0, x2d0)
 
-        l_2d = tf.reduce_sum(tf.abs(x2d-x2d0))
-        l_3d = tf.reduce_sum(tf.abs(q3d-q3d0))
-        l_sm = tf.reduce_sum(tf.squared_difference(J3d[1:], J3d[:-1]))
+        l_2d = tf.reduce_mean(tf.abs(x2d-x2d0))
+        l_3d = tf.reduce_mean(tf.abs(q3d-q3d0))
+        l_sm = tf.reduce_mean(tf.squared_difference(J3d[1:], J3d[:-1]))
         loss = 10 * l_2d + 100 * l_3d + 25 * l_sm
 
         optimizer = tf.train.AdamOptimizer()
@@ -203,7 +203,7 @@ class MotionReconstructionModel(object):
 
         #self.sess.run(tf.global_variables_initializer())
 
-        for i in range(300):
+        for i in range(100):
             _, x_val, loss_value = self.sess.run((train, x2d, loss))
             print("step {}, loss = {}".format(i, loss_value))
 

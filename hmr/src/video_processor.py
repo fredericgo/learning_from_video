@@ -7,7 +7,7 @@ from src.tf_pose.get_people import get_people
 from src.pytorch_multipose.multipose_get_people import multipose_get_people
 from src.util import openpose as op_util
 from src.util import image as img_util
-from smpl_to_deepmimic import (smpl_to_deepmimic)
+from src.util.smpl_to_deepmimic import (smpl_to_deepmimic)
 from .MotionReconstructionModel import MotionReconstructionModel
 from src.util.visualizer import Visualizer
 
