@@ -42,7 +42,7 @@ class VideoMotionProcessor(object):
     def __call__(self, img_dir, motion_path, vis_path):
         input_img_seq, process_params, img = self._preprocess(img_dir)
         verts, joints, q3d, J3d, cams = self._predict(input_img_seq)
-        x3d = self._convert_smpl_to_deepmimic(q3d, cams, process_params)
+        x3d = self._convert_smpl_to_deepmimic(q3d, joints, cams, process_params)
         self._save_motion(x3d, motion_path)
         self._save_visualization(img, J3d, process_params, joints, verts, cams, vis_path)
 
@@ -80,8 +80,8 @@ class VideoMotionProcessor(object):
     def _predict(self, img_seq):
         return self._model.predict(img_seq)
 
-    def _convert_smpl_to_deepmimic(self, q3d, cams, process_params):
-        return smpl_to_deepmimic(q3d, cams, process_params)
+    def _convert_smpl_to_deepmimic(self, q3d, j2d, cams, process_params):
+        return smpl_to_deepmimic(q3d, j2d, cams, process_params)
 
     def _save_visualization(self, imgs, J3d, proc_params, joints, verts, cams, vis_path):
         self._visualizer.plot_3d(J3d, vis_path)
