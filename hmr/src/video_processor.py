@@ -25,6 +25,7 @@ def crop_around_person(img):
                                                224)
     proc_param['min_pt'] = min_pt
     proc_param['max_pt'] = max_pt
+    proc_param['original_size'] = img.shape
     # Normalize image to [-1, 1]
     crop = 2 * ((crop / 255.) - 0.5)
     # Add batch dimension: 1 x D x D x 3
