@@ -40,6 +40,8 @@ def smpl_to_deepmimic(q3d, j2d, cams, process_params):
     x3d = np.zeros((num_steps, 44))
     for i in range(num_steps):
         x3d[i] = build_kinematic_tree(q3d[i], j2d[i], cams[i], process_params[i])
+    origin = x3d[0, 1:4]
+    x3d[:,1:4] = x3d[:, 1:4] - origin
     return x3d
 
 def calcRootTranslation1(j2d, cam, proc_param):
@@ -69,7 +71,7 @@ def calcRootTranslation(j2d, cam, proc_param):
     root_shifted[1] = orig_size[0] - root_shifted[1] 
     root_xy = root_shifted * undo_scale
     print(root_xy)
-    root_orig = np.hstack([root_xy, 5])
+    root_orig = np.hstack([root_xy, 0])
     return root_orig
 
 def build_kinematic_tree(theta, j2d, cam, proc_param):
