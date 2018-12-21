@@ -75,7 +75,8 @@ def calcRootTranslation(j2d, cam, proc_param):
     cam_s = cam[0]
     flength = 1.
     tz = flength / cam_s
-    root_orig = np.hstack([root_xy, 0])
+    root_orig = np.hstack([root_xy, tz])
+    
     print(root_orig)
     return root_orig
 
