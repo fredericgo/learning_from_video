@@ -64,12 +64,11 @@ def calcRootTranslation(j2d, cam, proc_param):
     img_size = proc_param['img_size']
     orig_size = proc_param['original_size']
     start_pt = proc_param['start_pt'] - 0.5 * img_size
-    scale = proc_param['scale']
-    undo_scale =  1.0 / 300
+    undo_scale = 1.0 / 300
 
-    root = j2d[0] 
+    root = j2d[0]
     root_shifted = (root + start_pt)
-    root_shifted[1] = orig_size[0] - root_shifted[1] 
+    root_shifted[1] = orig_size[0] - root_shifted[1]
     root_xy = root_shifted * undo_scale
 
     cam_s = cam[0]

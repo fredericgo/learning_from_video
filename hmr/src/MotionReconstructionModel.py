@@ -12,6 +12,7 @@ from .tf_smpl import projection as proj_util
 from .tf_smpl.batch_smpl import SMPL
 from .models import get_encoder_fn_separate
 
+
 class MotionReconstructionModel(object):
     def __init__(self, config, sess=None):
         """
@@ -55,10 +56,8 @@ class MotionReconstructionModel(object):
 
         self.smpl = SMPL(self.smpl_model_path, joint_type=self.joint_type)
 
-        # self.theta0_pl = tf.placeholder_with_default(
-        #     self.load_mean_param(), shape=[self.batch_size, self.total_params], name='theta0')
-        # self.theta0_pl = tf.placeholder(tf.float32, shape=[None, self.total_params], name='theta0')
-        self.img_enc_fn, self.threed_enc_fn = get_encoder_fn_separate(self.model_type)
+        self.img_enc_fn, self.threed_enc_fn = \
+            get_encoder_fn_separate(self.model_type)
 
         self.build_test_model_ief()
 
@@ -74,16 +73,15 @@ class MotionReconstructionModel(object):
         # motion reconstruction model setting
         self.num_hidden = 2048
 
-
     def build_test_model_ief(self):
         # Load mean value
-        self.mean_var = tf.Variable(tf.zeros((1, self.total_params)), name="mean_param", dtype=tf.float32)
+        self.mean_var = tf.Variable(tf.zeros((1, self.total_params)),
+                                    name="mean_param", dtype=tf.float32)
 
         # Extract image features.
         self.img_feat, self.E_var = self.img_enc_fn(self.images_pl,
                                                     is_training=False,
                                                     reuse=False)
-
         # Start loop
         self.all_verts = []
         self.all_kps = []
@@ -132,8 +130,8 @@ class MotionReconstructionModel(object):
     def morec_model(self, z0, x2d0):
         num_steps = z0.shape[0]
         z = tf.get_variable("Z",
-                  shape=(num_steps, 2048),
-                  initializer=tf.zeros_initializer())#, initializer=tf.constant(z0))
+                            shape=(num_steps, 2048),
+                            initializer=tf.zeros_initializer())
         theta_prev = tf.tile(self.mean_var, [num_steps, 1])
         for i in np.arange(self.num_stage):
             print('Iteration %d' % i)
@@ -179,39 +177,40 @@ class MotionReconstructionModel(object):
         """
         images = images
         img_size = images[0].shape[:2]
-        num_steps = len(images)
+        # num_steps = len(images)
         results = self.initial_predict(images)
         x2d0 = results['joints']
-        q3d0 = results['theta'][:,self.num_cam:(self.num_cam + self.num_theta)]
+        q3d0 = results['theta'][:, self.num_cam:(self.num_cam + self.num_theta)]
         z0 = results['hidden']
         verts, x2d, q3d, Rs, J3d = self.morec_model(z0, x2d0)
 
-        l_2d = tf.reduce_mean(tf.abs(x2d-x2d0))
-        l_3d = tf.reduce_mean(tf.abs(q3d-q3d0))
+        l_2d = tf.reduce_mean(tf.abs(x2d - x2d0))
+        l_3d = tf.reduce_mean(tf.abs(q3d - q3d0))
         l_sm = tf.reduce_mean(tf.squared_difference(J3d[1:], J3d[:-1]))
         l_cam = tf.reduce_mean(tf.squared_difference(Rs[1:], Rs[:-1]))
         loss = 10 * l_2d + 100 * l_3d + 25 * l_sm + 25 * l_cam
 
         optimizer = tf.train.AdamOptimizer()
-        train_vars =  tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, "Z")
+        train_vars = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, "Z")
         train = optimizer.minimize(loss, var_list=train_vars)
         uninit_names = set(self.sess.run(tf.report_uninitialized_variables()))
-        uninit_vars = [ v for v in tf.global_variables() 
+        uninit_vars = [v for v in tf.global_variables()
                        if v.name.split(":")[0] in uninit_names]
-        #train_writer = tf.summary.FileWriter( 'summary', self.sess.graph)
+        # train_writer = tf.summary.FileWriter( 'summary', self.sess.graph)
         init_op = tf.variables_initializer(uninit_vars)
         self.sess.run(init_op)
 
-        #self.sess.run(tf.global_variables_initializer())
+        # self.sess.run(tf.global_variables_initializer())
 
         for i in range(100):
             _, x_val, loss_value = self.sess.run((train, x2d, loss))
             print("step {}, loss = {}".format(i, loss_value))
 
-        verts_p, j2d, q3d_pred, j3d_pred, cams = self.sess.run([verts, x2d, q3d, J3d, Rs])
-        #cams = results['cams']
+        verts_p, j2d, q3d_pred, j3d_pred, cams = self.sess.run(
+            [verts, x2d, q3d, J3d, Rs])
+        # cams = results['cams']
         j2d = ((j2d + 1) * 0.5) * img_size
-        return verts_p, j2d, q3d_pred, j3d_pred, cams #results['joints3d']
+        return verts_p, j2d, q3d_pred, j3d_pred, cams  # results['joints3d']
 
     def initial_predict(self, images):
         """
@@ -223,10 +222,10 @@ class MotionReconstructionModel(object):
         res = []
         b = np.zeros((self.batch_size, self.img_size, self.img_size, 3))
         for i in range(0, n, self.batch_size):
-            nb = images[i:i+self.batch_size].shape[0]
-            b[:nb] = images[i:i+self.batch_size]
+            nb = images[i:i + self.batch_size].shape[0]
+            b[:nb] = images[i:i + self.batch_size]
             out = self.predict_dict(b)
-            out = { k: v[:nb] for k, v in out.items()}
+            out = {k: v[:nb] for k, v in out.items()}
             res.append(out)
 
         results = {}
@@ -238,7 +237,6 @@ class MotionReconstructionModel(object):
         results['hidden'] = np.concatenate([v['hidden'] for v in res])
 
         return results
-
 
     def predict_dict(self, images):
         """
