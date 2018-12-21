@@ -202,7 +202,7 @@ class MotionReconstructionModel(object):
 
         # self.sess.run(tf.global_variables_initializer())
 
-        for i in range(100):
+        for i in range(300):
             _, x_val, loss_value = self.sess.run((train, x2d, loss))
             print("step {}, loss = {}".format(i, loss_value))
 
