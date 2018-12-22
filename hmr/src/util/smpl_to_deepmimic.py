@@ -8,19 +8,19 @@ joints = {
     'Chest': 3,
     'L_Shoulder': 16, 'L_Elbow': 18,
     'R_Shoulder': 17, 'R_Elbow': 19,
-    'L_Hip': 1,       'L_Knee': 4, 'L_Ankle': 7,
-    'R_Hip': 2,       'R_Knee': 5, 'R_Ankle': 8
+    'L_Hip': 1, 'L_Knee': 4, 'L_Ankle': 7,
+    'R_Hip': 2, 'R_Knee': 5, 'R_Ankle': 8
 }
 
 # LR reverse for deepmimic
 target_joints = {
     'Pelvis': [4, 5, 6, 7],
-    'Neck':  [12, 13, 14, 15],
+    'Neck': [12, 13, 14, 15],
     'Chest': [8, 9, 10, 11],
-    'L_Shoulder':  [39, 40, 41, 42], 'L_Elbow': [43],
-    'R_Shoulder':  [25, 26, 27, 28], 'R_Elbow': [29],
-    'L_Hip': [30, 31, 32, 33],      'L_Knee': [34],       'L_Ankle': [35, 36, 37, 38],
-    'R_Hip': [16, 17, 18, 19],      'R_Knee': [20],       'R_Ankle': [21, 22, 23, 24],
+    'L_Shoulder': [39, 40, 41, 42], 'L_Elbow': [43],
+    'R_Shoulder': [25, 26, 27, 28], 'R_Elbow': [29],
+    'L_Hip': [30, 31, 32, 33], 'L_Knee': [34], 'L_Ankle': [35, 36, 37, 38],
+    'R_Hip': [16, 17, 18, 19], 'R_Knee': [20], 'R_Ankle': [21, 22, 23, 24],
 }
 
 
@@ -30,35 +30,37 @@ def vec_to_quaternion(x):
     q = qq.axangle2quat(x_norm, th)
     return q
 
+
 def vec_to_angle(x):
     th = np.linalg.norm(x)
-    x_norm = x / th
     return th
+
 
 def smpl_to_deepmimic(q3d, j2d, cams, process_params):
     num_steps = q3d.shape[0]
     x3d = np.zeros((num_steps, 44))
     for i in range(num_steps):
-        x3d[i] = build_kinematic_tree(q3d[i], j2d[i], cams[i], process_params[i])
+        x3d[i] = build_kinematic_tree(q3d[i], j2d[i],
+                                      cams[i], process_params[i])
     origin = x3d[0, 1:4]
-    x3d[:,1:4] = x3d[:, 1:4] - origin + np.array([0, 0.7, 0])
+    x3d[:, 1:4] = x3d[:, 1:4] - origin + np.array([0, 0.7, 0])
     return x3d
+
 
 def calcRootTranslation1(j2d, cam, proc_param):
     img_size = proc_param['img_size']
     undo_scale = 1. / np.array(proc_param['scale'])
 
     cam_s = cam[0]
-    cam_pos = cam[1:]
     flength = 500.
     tz = flength / (0.5 * img_size * cam_s)
     principal_pt = np.array([img_size, img_size]) / 2.
     start_pt = proc_param['start_pt'] - 0.5 * img_size
     final_principal_pt = (principal_pt + start_pt) * undo_scale
-    pp_orig = final_principal_pt / (img_size*undo_scale)
     trans = np.hstack([pp_orig, tz])
-    #trans[0], trans[1], trans[2] =  trans[0], trans[1], 0
+    # trans[0], trans[1], trans[2] =  trans[0], trans[1], 0
     return trans
+
 
 def calcRootTranslation(j2d, cam, proc_param):
     img_size = proc_param['img_size']
@@ -68,16 +70,17 @@ def calcRootTranslation(j2d, cam, proc_param):
 
     root = j2d[0]
     root_shifted = (root + start_pt)
-    root_shifted[1] = orig_size[0] - root_shifted[1]
+    root_shifted[1] = orig_size[1] - root_shifted[1]
     root_xy = root_shifted * undo_scale
 
     cam_s = cam[0]
     flength = 1.
     tz = flength / cam_s
     root_orig = np.hstack([root_xy, tz])
-    
+
     print(root_orig)
     return root_orig
+
 
 def build_kinematic_tree(theta, j2d, cam, proc_param):
     """
@@ -99,7 +102,7 @@ def build_kinematic_tree(theta, j2d, cam, proc_param):
     # 12 thorax
     # 13 head
 
-    ## GYM joints
+    # GYM joints
     # motions[:, 0] = 0.0625
     # motions[:, 4:8] = [1, 0,0,0]    # root rotation
     # motions[:, 8:12] = [1, 0,0,0]   # chest rotation
@@ -115,11 +118,11 @@ def build_kinematic_tree(theta, j2d, cam, proc_param):
     # motions[:, 39:43] = [1, 0, 0, 0] # left shoulder rot
     # motions[:, 43] = [1, 0, 0, 0] # left elbow rot
 
-    #theta = theta[self.num_cam:(self.num_cam + self.num_theta)]
-    theta = theta.reshape((-1,3))
+    # theta = theta[self.num_cam:(self.num_cam + self.num_theta)]
+    theta = theta.reshape((-1, 3))
     z = np.zeros(44)
 
-    r = [0.7071, 0, 0.7071, 0] # SMPL to DeepMimic
+    r = [0.7071, 0, 0.7071, 0]  # SMPL to DeepMimic
     z[1:4] = calcRootTranslation(j2d, cam, proc_param)
     for joi, num in joints.items():
         x = theta[num]
