@@ -11,26 +11,38 @@ from src.util.smpl_to_deepmimic import (smpl_to_deepmimic)
 from .MotionReconstructionModel import MotionReconstructionModel
 from src.util.visualizer import Visualizer
 
+from collections import namedtuple
 import cv2
 
 
-def crop_around_person(img):
+_2DPoseInfo = namedtuple('_2DPoseInfo',
+                         ['scale', 'crop_image_size',
+                          'crop_start_pt', 'crop_end_pt',
+                          'bbox_start_pt', 'bbox_end_pt',
+                          'original_image_size'])
+
+
+def crop_person(img):
     kps = multipose_get_people(img)
     if img.shape[2] == 4:
         img = img[:, :, :3]
 
-    scale, center, min_pt, max_pt = op_util.get_bbox(kps)
+    scale, center, min_pt, max_pt = op_util.get_person(kps)
     crop, proc_param = img_util.scale_and_crop(img, scale, center,
                                                224)
-    proc_param['min_pt'] = min_pt
-    proc_param['max_pt'] = max_pt
-    proc_param['original_size'] = img.shape
+    info = _2DPoseInfo(scale=proc_param['scale'],
+                       crop_image_size=proc_param['img_size'],
+                       crop_start_pt=proc_param['start_pt'],
+                       crop_end_pt=proc_param['end_pt'],
+                       bbox_start_pt=min_pt, bbox_end_pt=max_pt,
+                       original_image_size=img.shape)
+
     # Normalize image to [-1, 1]
     crop = 2 * ((crop / 255.) - 0.5)
     # Add batch dimension: 1 x D x D x 3
     crop = np.expand_dims(crop, 0)
 
-    return crop, proc_param
+    return crop, info
 
 
 class VideoMotionProcessor(object):
@@ -62,14 +74,14 @@ class VideoMotionProcessor(object):
         self.original_size = imgs[0].shape[:2]
 
         X = np.zeros((self.num_imgs, self.picture_size, self.picture_size, 3))
-        process_params = [dict() for i in range(self.num_imgs)]
+        process_params = [None for i in range(self.num_imgs)]
 
         i_succ = 0
         for i, img in enumerate(imgs):
             img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
             print("File: {}".format(i))
             try:
-                input_img, param = crop_around_person(img)
+                input_img, param = crop_person(img)
                 X[i] = input_img
                 process_params[i] = param
             except ValueError:

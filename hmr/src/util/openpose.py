@@ -15,9 +15,9 @@ def read_json(json_path):
     return kps
 
 
-def get_bbox(kps, vis_thr=0.2):
+def get_person(kps, vis_thr=0.2):
     if isinstance(kps, basestring):
-        kps = read_json(kps)        
+        kps = read_json(kps)
     # Pick the most confident detection.
     scores = [np.mean(kp[kp[:, 2] > vis_thr, 2]) for kp in kps]
     kp = kps[np.argmax(scores)]
@@ -34,6 +34,7 @@ def get_bbox(kps, vis_thr=0.2):
     scale = 150. / person_height
 
     return scale, center, min_pt, max_pt
+
 
 def get_openpose_best_score(kps, vis_thr):
     scores = [np.mean(kp[kp[:, 2] > vis_thr, 2]) for kp in kps]
