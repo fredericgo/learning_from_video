@@ -205,8 +205,11 @@ class MotionReconstructionModel(object):
         for i in range(300):
             _, x_val, loss_value = self.sess.run((train, x2d, loss))
             loss_rat = np.abs(loss_value - loss_old) / loss_value
-            print("step {}, loss = {}, ratio = {}".format(i, loss_value, loss_rat))
-
+            print("step {}, loss = {}, ratio = {}".format(i,
+                                                          loss_value,
+                                                          loss_rat))
+            if loss_rat < 1e-4:
+                break
             loss_old = loss_value
 
         verts_p, j2d, q3d_pred, j3d_pred, cams = self.sess.run(
