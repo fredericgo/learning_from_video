@@ -201,10 +201,13 @@ class MotionReconstructionModel(object):
         self.sess.run(init_op)
 
         # self.sess.run(tf.global_variables_initializer())
-
+        loss_old = 0
         for i in range(300):
             _, x_val, loss_value = self.sess.run((train, x2d, loss))
-            print("step {}, loss = {}".format(i, loss_value))
+            loss_rat = np.abs(loss_value - loss_old) / loss_value
+            print("step {}, loss = {}, ratio = {}".format(i, loss_value, loss_rat))
+
+            loss_old = loss_value
 
         verts_p, j2d, q3d_pred, j3d_pred, cams = self.sess.run(
             [verts, x2d, q3d, J3d, Rs])
