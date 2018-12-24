@@ -180,7 +180,7 @@ class MotionReconstructionModel(object):
         # num_steps = len(images)
         results = self.initial_predict(images)
         x2d0 = results['joints']
-        print(x2d0)
+        print(x2d0.shape)
         q3d0 = results['theta'][:, self.num_cam:(self.num_cam + self.num_theta)]
         z0 = results['hidden']
         verts, x2d, q3d, Rs, J3d = self.morec_model(z0, x2d0)
