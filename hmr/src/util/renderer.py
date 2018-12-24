@@ -237,7 +237,7 @@ def render_model(verts,
 
 
 def get_original(proc_param, verts, cam, joints, img_size):
-    img_size = proc_param['img_size']
+    img_size = proc_param.crop_image_size
     undo_scale = 1. / np.array(proc_param['scale'])
 
     cam_s = cam[0]
@@ -248,7 +248,7 @@ def get_original(proc_param, verts, cam, joints, img_size):
     trans = np.hstack([cam_pos, tz])
     vert_shifted = verts + trans
 
-    start_pt = proc_param['start_pt'] - 0.5 * img_size
+    start_pt = proc_param.crop_start_pt - 0.5 * img_size
     final_principal_pt = (principal_pt + start_pt) * undo_scale
     cam_for_render = np.hstack(
         [np.mean(flength * undo_scale), final_principal_pt])
@@ -257,7 +257,7 @@ def get_original(proc_param, verts, cam, joints, img_size):
     # kp_original = (joints + proc_param['start_pt']) * undo_scale
     # Subtract padding from joints.
     margin = int(img_size / 2)
-    kp_original = (joints + proc_param['start_pt'] - margin) * undo_scale
+    kp_original = (joints + proc_param.crop_start_pt - margin) * undo_scale
 
     return cam_for_render, vert_shifted, kp_original
 
