@@ -36,6 +36,7 @@ class Params(object):
     batch_size = 32
     print_freq = 20
 
+
 class MultiPoseNetEstimator(object):
     def __init__(self, params):
         assert isinstance(params, Params)

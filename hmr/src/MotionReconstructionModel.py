@@ -175,6 +175,7 @@ class MotionReconstructionModel(object):
         images: num_batch, img_size, img_size, 3
         Preprocessed to range [-1, 1]
         """
+
         images = images
         img_size = images[0].shape[:2]
         # num_steps = len(images)
