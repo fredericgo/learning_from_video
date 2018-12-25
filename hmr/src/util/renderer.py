@@ -238,7 +238,7 @@ def render_model(verts,
 
 def get_original(proc_param, verts, cam, joints, img_size):
     img_size = proc_param.crop_image_size
-    undo_scale = 1. / np.array(proc_param['scale'])
+    undo_scale = 1. / np.array(proc_param.scale)
 
     cam_s = cam[0]
     cam_pos = cam[1:]

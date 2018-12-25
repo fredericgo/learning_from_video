@@ -34,7 +34,7 @@ def crop_person(img):
                        crop_image_size=proc_param['img_size'],
                        crop_start_pt=proc_param['start_pt'],
                        crop_end_pt=proc_param['end_pt'],
-                       bbox_start_pt=min_pt, bbox_end_pt=max_pt,
+                       bbox_start_pt=max_pt, bbox_end_pt=min_pt,
                        original_image_size=img.shape)
 
     # Normalize image to [-1, 1]

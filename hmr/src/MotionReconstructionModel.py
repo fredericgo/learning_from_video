@@ -180,7 +180,6 @@ class MotionReconstructionModel(object):
         # num_steps = len(images)
         results = self.initial_predict(images)
         x2d0 = results['joints']
-        print(x2d0.shape)
         q3d0 = results['theta'][:, self.num_cam:(self.num_cam + self.num_theta)]
         z0 = results['hidden']
         verts, x2d, q3d, Rs, J3d = self.morec_model(z0, x2d0)
@@ -209,14 +208,15 @@ class MotionReconstructionModel(object):
             print("step {}, loss = {}, ratio = {}".format(i,
                                                           loss_value,
                                                           loss_rat))
-            if loss_rat < 1e-4:
+            if loss_rat < 5e-5:
                 break
             loss_old = loss_value
 
         verts_p, j2d, q3d_pred, j3d_pred, cams = self.sess.run(
             [verts, x2d, q3d, J3d, Rs])
         # cams = results['cams']
-        j2d = ((j2d + 1) * 0.5) * img_size
+        j2d = x2d0
+        #j2d = ((j2d + 1) * 0.5) * img_size
         return verts_p, j2d, q3d_pred, j3d_pred, cams  # results['joints3d']
 
     def initial_predict(self, images):
