@@ -28,7 +28,7 @@ def video_to_frames(input_loc, output_loc):
         # Extract the frame
         ret, frame = cap.read()
         # Write the results back to output location.
-        cv2.imwrite(output_loc + "/%#05d.jpg" % (count+1), frame)
+        cv2.imwrite(output_loc + "/%#05d.jpg" % (count + 1), frame)
         count = count + 1
         # If there are no more frames left
         if (count > (video_length-1)):
