@@ -27,7 +27,7 @@ def crop_person(img):
     if img.shape[2] == 4:
         img = img[:, :, :3]
 
-    scale, center, min_pt, max_pt = op_util.get_person(kps)
+    scale, center, min_pt, max_pt = op_util.get_bbox_info(kps)
     crop, proc_param = img_util.scale_and_crop(img, scale, center,
                                                224)
     info = _2DPoseInfo(scale=proc_param['scale'],
