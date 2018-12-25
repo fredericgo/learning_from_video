@@ -2,22 +2,22 @@
 # ----- SET YOUR PATH!! -----
 # ---------------------------
 # This is where you want all of your tf_records to be saved:
-DATA_DIR=/scratch1/storage/hmr_release_files/test_tf_datasets
+DATA_DIR=/home/fredericgo/hmr_training_data/tf_datasets
 
 # This is the directory that contains README.txt
-LSP_DIR=/scratch1/storage/human_datasets/lsp_dataset
+LSP_DIR=/home/fredericgo/hmr_training_data/human_datasets/lsp_dataset
 
 # This is the directory that contains README.txt
-LSP_EXT_DIR=/scratch1/storage/human_datasets/lsp_extended
+LSP_EXT_DIR=/home/fredericgo/hmr_training_data/human_datasets/lsp_extended
 
 # This is the directory that contains 'images' and 'annotations'
-MPII_DIR=/scratch1/storage/human_datasets/mpii
+MPII_DIR=/home/fredericgo/hmr_training_data/human_datasets/mpii
 
 # This is the directory that contains README.txt
-COCO_DIR=/scratch1/storage/coco
+COCO_DIR=/home/fredericgo/hmr_training_data/coco
 
 # This is the directory that contains README.txt, S1..S8, etc
-MPI_INF_3DHP_DIR=/scratch1/storage/mpi_inf_3dhp
+MPI_INF_3DHP_DIR=/home/fredericgo/hmr_training_data/mpi_inf_3dhp
 
 ## Mosh
 # This is the path to the directory that contains neutrSMPL_* directories
