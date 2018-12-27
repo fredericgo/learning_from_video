@@ -1,2 +1,7 @@
-ffmpeg -y -ss 00:00:05.9  -t 00:00:03 -i data/raw/broad_jump.mp4 -r 50.0 -vf scale=1280:720 data/frames/broad_jump/img_%5d.jpg 
+VIDEONAME=mandance.mp4
+TRICKNAME=rotation
+
+mkdir data/frames/$TRICKNAME
+
+ffmpeg -y -ss 00:00:21 -t 00:00:02 -i data/raw/$VIDEONAME -r 50.0 -vf scale=1280:720 data/frames/$TRICKNAME/img_%5d.jpg 
 

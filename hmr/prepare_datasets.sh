@@ -14,7 +14,7 @@ LSP_EXT_DIR=/home/fredericgo/hmr_training_data/human_datasets/lsp_extended
 MPII_DIR=/home/fredericgo/hmr_training_data/human_datasets/mpii
 
 # This is the directory that contains README.txt
-COCO_DIR=/home/fredericgo/hmr_training_data/coco
+COCO_DIR=/home/fredericgo/hmr_training_data/human_datasets/coco
 
 # This is the directory that contains README.txt, S1..S8, etc
 MPI_INF_3DHP_DIR=/home/fredericgo/hmr_training_data/mpi_inf_3dhp
