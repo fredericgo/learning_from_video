@@ -50,8 +50,17 @@ class VideoMotionProcessor(object):
         self.picture_size = 224
         self._model = MotionReconstructionModel(config)
         self._visualizer = Visualizer()
+        self._deepmimic_dir = config.deepmimic_dir
 
-    def __call__(self, img_dir, motion_path, vis_path):
+    def __call__(self, skill):
+        img_dir = "data/youtube/{}/".format(skill)
+        motion_file = "humanoid3d_{}.txt".format(skill)
+        motion_path = os.path.join(self._deepmimic_dir,
+                                   "data/motions/", motion_file)
+        vis_dir = os.path.join("output", skill)
+        if not os.path.exists(vis_dir):
+            os.makedirs(vis_dir)
+
         input_img_seq, process_params, img = self._preprocess(img_dir)
         verts, joints, q3d, J3d, cams = self._predict(input_img_seq)
         x3d = self._convert_smpl_to_deepmimic(
@@ -60,7 +69,7 @@ class VideoMotionProcessor(object):
         self._save_visualization(img, J3d,
                                  process_params,
                                  joints, verts,
-                                 cams, vis_path)
+                                 cams, vis_dir)
 
     def _preprocess(self, img_dir):
         files = [f for f in os.listdir(img_dir)

@@ -52,6 +52,8 @@ flags.DEFINE_string(
     'joint_type', 'cocoplus',
     'cocoplus (19 keypoints) or lsp 14 keypoints, returned by SMPL')
 
+flags.DEFINE_string('deepmimic_dir', '/home/fredericgo/DeepMimic/', 'DeepMimic dir')
+
 # Training settings:
 # TODO! If you want to train, change this to your 'tf_datasets' or specify it with the flag.
 DATA_DIR = '/scratch1/projects/tf_datasets/'
